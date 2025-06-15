@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hovedskjerm - Operasjon Grønn Innsats</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8fbc8f;
+            margin-bottom: 5px;
+        }
+
+        .welcome-text {
+            font-size: 14px;
+            color: #b8d4b8;
+        }
+
+        .quick-status {
+            background: rgba(46, 125, 46, 0.3);
+            border-radius: 15px;
+            padding: 12px 20px;
+            margin: 20px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .status-item {
+            flex: 1;
+        }
+
+        .status-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #8fbc8f;
+        }
+
+        .status-label {
+            font-size: 11px;
+            color: #b8d4b8;
+            margin-top: 2px;
+        }
+
+        .monthly-theme {
+            margin: 20px;
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border: 1px solid #5a9a5a;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .theme-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8fbc8f;
+            margin-bottom: 5px;
+        }
+
+        .theme-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .theme-bonus {
+            background: #5a9a5a;
+            color: #1a2e1a;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .section {
+            margin: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8fbc8f;
+            margin-bottom: 12px;
+        }
+
+        .mission-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .mission-btn {
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 12px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .mission-btn:hover {
+            transform: translateY(-2px);
+            border-color: #5a9a5a;
+        }
+
+        .mission-btn.food {
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border-color: rgba(90, 154, 90, 0.3);
+        }
+
+        .mission-btn.repair {
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.4) 0%, rgba(255, 140, 0, 0.2) 100%);
+            border-color: rgba(255, 140, 0, 0.3);
+        }
+
+        .mission-btn.shopping {
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.4) 0%, rgba(33, 150, 243, 0.2) 100%);
+            border-color: rgba(33, 150, 243, 0.3);
+        }
+
+        .mission-btn.tips {
+            background: linear-gradient(135deg, rgba(255, 143, 0, 0.4) 0%, rgba(255, 193, 7, 0.2) 100%);
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        .mission-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .mission-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .mission-points {
+            font-size: 11px;
+            color: #b8d4b8;
+        }
+
+        .mission-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 18px;
+            height: 18px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #ffffff;
+        }
+
+        .cultura-quiz {
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.3) 0%, rgba(30, 136, 229, 0.2) 100%);
+            border: 1px solid #2196F3;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cultura-quiz:hover {
+            background: linear-gradient(135deg, rgba(25, 118, 210, 0.4) 0%, rgba(30, 136, 229, 0.3) 100%);
+        }
+
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .quiz-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64B5F6;
+        }
+
+        .quiz-points {
+            background: #2196F3;
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .quiz-question {
+            font-size: 13px;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .radio-option:hover {
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .radio-input {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #64B5F6;
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .radio-input.checked {
+            background: #2196F3;
+            border-color: #2196F3;
+        }
+
+        .radio-input.checked::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .radio-label {
+            font-size: 12px;
+            color: #ffffff;
+        }
+
+        .submit-quiz {
+            background: #2196F3;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-quiz:hover {
+            background: #1976D2;
+        }
+
+        .submit-quiz:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(90, 154, 90, 0.2);
+            border-radius: 0 0 20px 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8fbc8f;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+        }
+
+        .nav-item:hover {
+            background: rgba(90, 154, 90, 0.2);
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+            background: rgba(90, 154, 90, 0.3);
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+            font-size: 16px;
+        }
+
+        .nav-item.active .nav-icon {
+            background: rgba(143, 188, 143, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="content-area">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>🔋 100%</span>
+                </div>
+
+                <div class="header">
+                    <div class="app-title">OPERASJON GRØNN INNSATS</div>
+                    <div class="welcome-text">Agent #1247 • 6 oppdrag fullført</div>
+                </div>
+
+                <div class="quick-status">
+                    <div class="status-item">
+                        <div class="status-value">190</div>
+                        <div class="status-label">Poeng</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">#18</div>
+                        <div class="status-label">Plassering</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">✅</div>
+                        <div class="status-label">Kvalifisert</div>
+                    </div>
+                </div>
+
+                <div class="monthly-theme">
+                    <div class="theme-title">🎯 Januar utfordring</div>
+                    <div class="theme-name">NULL-AVFALL</div>
+                    <div class="theme-bonus">+5 bonus på alle oppdrag</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">📋 Faste oppdrag</div>
+                    <div class="mission-buttons">
+                        <div class="mission-btn food" onclick="selectMission('food')">
+                            <div class="mission-status">✓</div>
+                            <div class="mission-icon">🥗</div>
+                            <div class="mission-title">Vegetar middag</div>
+                            <div class="mission-points">Opptil 35 poeng</div>
+                        </div>
+
+                        <div class="mission-btn repair" onclick="selectMission('repair')">
+                            <div class="mission-status">✓</div>
+                            <div class="mission-icon">🔧</div>
+                            <div class="mission-title">Reparasjon</div>
+                            <div class="mission-points">Opptil 40 poeng</div>
+                        </div>
+
+                        <div class="mission-btn shopping" onclick="selectMission('shopping')">
+                            <div class="mission-status">✓</div>
+                            <div class="mission-icon">🛒</div>
+                            <div class="mission-title">Økologisk handel</div>
+                            <div class="mission-points">Opptil 35 poeng</div>
+                        </div>
+
+                        <div class="mission-btn tips" onclick="selectMission('tips')">
+                            <div class="mission-status">✓</div>
+                            <div class="mission-icon">💡</div>
+                            <div class="mission-title">Miljøtips</div>
+                            <div class="mission-points">Opptil 50 poeng</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">🏦 Cultura Quiz</div>
+                    <div class="cultura-quiz">
+                        <div class="quiz-header">
+                            <div class="quiz-title">Månedens spørsmål</div>
+                            <div class="quiz-points">+15 poeng</div>
+                        </div>
+                        <div class="quiz-question">
+                            Er du kunde i Cultura Bank?
+                        </div>
+                        <div class="radio-group">
+                            <div class="radio-option" onclick="selectRadio(0)">
+                                <div class="radio-input" id="radio-0"></div>
+                                <div class="radio-label">Ja, jeg er kunde</div>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(1)">
+                                <div class="radio-input" id="radio-1"></div>
+                                <div class="radio-label">Nei, men jeg vurderer det</div>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(2)">
+                                <div class="radio-input" id="radio-2"></div>
+                                <div class="radio-label">Nei, har ikke hørt om Cultura før</div>
+                            </div>
+                        </div>
+                        <button class="submit-quiz" id="submit-quiz" onclick="submitQuiz()" disabled>
+                            Send svar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active">
+                    <div class="nav-icon">🏠</div>
+                    <span>Senter</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('stats')">
+                    <div class="nav-icon">📊</div>
+                    <span>Status</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('leaderboard')">
+                    <div class="nav-icon">🏆</div>
+                    <span>Ledere</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('profile')">
+                    <div class="nav-icon">👤</div>
+                    <span>Profil</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedAnswer = null;
+
+        function selectMission(type) {
+            const missions = {
+                'food': 'Åpner vegetar middag-oppgave...',
+                'repair': 'Åpner reparasjons-oppgave...',
+                'shopping': 'Åpner økologisk handel-oppgave...',
+                'tips': 'Åpner miljøtips-oppgave...'
+            };
+            alert(missions[type]);
+        }
+
+        function selectRadio(index) {
+            // Clear all radio buttons
+            for (let i = 0; i < 3; i++) {
+                document.getElementById(`radio-${i}`).classList.remove('checked');
+            }
+            
+            // Select the clicked one
+            document.getElementById(`radio-${index}`).classList.add('checked');
+            selectedAnswer = index;
+            
+            // Enable submit button
+            document.getElementById('submit-quiz').disabled = false;
+        }
+
+        function submitQuiz() {
+            if (selectedAnswer === null) return;
+            
+            const answers = [
+                'Flott! Takk for at du er Cultura Bank-kunde. Du får 15 poeng + 20 ekstra Cultura-kundepoeng på alle oppdrag!',
+                'Spennende! Utforsk cultura.no for å lære mer om verdibasert banking. Du får 15 poeng for svaret!',
+                'Velkommen til å lære om oss! Cultura Bank er Norges mest etiske bank. Du får 15 poeng + bonus-link til cultura.no!'
+            ];
+            
+            alert(answers[selectedAnswer]);
+            
+            // Disable the quiz after submission
+            document.querySelector('.cultura-quiz').style.opacity = '0.6';
+            document.getElementById('submit-quiz').textContent = 'Takk for svaret!';
+            document.getElementById('submit-quiz').disabled = true;
+        }
+
+        function navigateTo(page) {
+            switch(page) {
+                case 'stats':
+                    alert('Navigerer til din status...');
+                    break;
+                case 'leaderboard':
+                    alert('Navigerer til ledertavle...');
+                    break;
+                case 'profile':
+                    alert('Navigerer til profil...');
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

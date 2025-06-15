@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegetarmiddag - Operasjon Grønn Innsats</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            color: #ffffff;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            border-radius: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-button {
+            width: 40px;
+            height: 40px;
+            background: rgba(90, 154, 90, 0.2);
+            border: 1px solid #5a9a5a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8fbc8f;
+            font-size: 18px;
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #8fbc8f;
+        }
+
+        .mission-header {
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border: 1px solid #5a9a5a;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .mission-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5a9a5a 0%, #8fbc8f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+        }
+
+        .mission-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .mission-points {
+            font-size: 14px;
+            color: #8fbc8f;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .usage-indicator {
+            font-size: 13px;
+            color: #FFE082;
+            margin-bottom: 8px;
+            background: rgba(255, 193, 7, 0.2);
+            padding: 4px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .bonus-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #8fbc8f 0%, #5a9a5a 100%);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a2e1a;
+        }
+
+        .form-section {
+            padding: 0 20px 100px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #8fbc8f;
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            color: #ffffff;
+            font-size: 16px;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .form-input::placeholder {
+            color: #b8d4b8;
+        }
+
+        .photo-section {
+            background: rgba(46, 125, 46, 0.2);
+            border: 2px dashed rgba(90, 154, 90, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .points-preview {
+            background: rgba(143, 188, 143, 0.2);
+            border: 1px solid #8fbc8f;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .points-title {
+            font-size: 14px;
+            color: #8fbc8f;
+            margin-bottom: 8px;
+        }
+
+        .points-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .environmental-impact {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3) 0%, rgba(129, 199, 132, 0.2) 100%);
+            border: 1px solid #4CAF50;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .impact-header {
+            font-size: 16px;
+            color: #4CAF50;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .impact-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .impact-stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-bottom: 4px;
+        }
+
+        .stat-desc {
+            font-size: 11px;
+            color: #81C784;
+        }
+
+        .monthly-goal {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .goal-header {
+            font-size: 12px;
+            color: #4CAF50;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .goal-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #81C784 100%);
+            width: 50%;
+            border-radius: 4px;
+        }
+
+        .goal-text {
+            font-size: 10px;
+            color: #66BB6A;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #5a9a5a 0%, #8fbc8f 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 18px;
+            margin: 20px;
+            color: #1a2e1a;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: calc(100% - 40px);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+
+            <div class="header">
+                <div class="back-button">←</div>
+                <div class="header-title">OPPDRAGSRAPPORT</div>
+                <div style="width: 40px;"></div>
+            </div>
+
+            <div class="mission-header">
+                <div class="mission-icon">🥗</div>
+                <div class="mission-title">Vegetar Middag</div>
+                <div class="mission-points">30 poeng per middag • Mål: 1 per uke</div>
+                <div class="usage-indicator">Registrert: 2 av 4 denne måneden</div>
+                <div class="bonus-tag">+5 Januar-bonus</div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-group">
+                    <label class="form-label">📝 Beskriv oppdraget</label>
+                    <textarea 
+                        class="form-input" 
+                        placeholder="Fortell om den vegetariske middagen du lagde..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📸 Opplast bilde av middagen</label>
+                    <div class="photo-section">
+                        <div style="font-size: 24px; margin-bottom: 8px;">📷</div>
+                        <div>Trykk for å ta bilde</div>
+                        <div style="font-size: 12px; color: #b8d4b8;">eller velg fra galleri</div>
+                    </div>
+                </div>
+
+                <div class="points-preview">
+                    <div class="points-title">Estimerte poeng for dette oppdraget</div>
+                    <div class="points-total">35</div>
+                </div>
+
+                <div class="environmental-impact">
+                    <div class="impact-header">🌍 Miljøpåvirkning</div>
+                    <div class="impact-stats">
+                        <div class="impact-stat">
+                            <div class="stat-number">~5 kg CO2</div>
+                            <div class="stat-desc">spart med denne middagen</div>
+                        </div>
+                        <div class="impact-stat">
+                            <div class="stat-number">10 kg CO2</div>
+                            <div class="stat-desc">totalt spart denne måneden</div>
+                        </div>
+                    </div>
+                    <div class="monthly-goal">
+                        <div class="goal-header">Månedens mål: 4 vegetarmiddager = ~20 kg CO2 spart</div>
+                        <div class="goal-progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="goal-text">50% av målet nådd (2 av 4 middager)</div>
+                    </div>
+                </div>
+
+                <button class="submit-button">
+                    🚀 SEND OPPDRAGSRAPPORT
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

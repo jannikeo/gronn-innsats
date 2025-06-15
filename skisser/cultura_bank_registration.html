@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrering - Operasjon Grønn Innsats</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            color: #ffffff;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            border-radius: 20px;
+            overflow-y: auto;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-button {
+            width: 40px;
+            height: 40px;
+            background: rgba(90, 154, 90, 0.2);
+            border: 1px solid #5a9a5a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8fbc8f;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(90, 154, 90, 0.3);
+        }
+
+        .header-title {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #8fbc8f;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(90, 154, 90, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: #8fbc8f;
+            transform: scale(1.2);
+        }
+
+        .form-container {
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #8fbc8f;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: #b8d4b8;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #8fbc8f;
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: #ff6b6b;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8fbc8f;
+            background: rgba(46, 125, 46, 0.3);
+            box-shadow: 0 0 15px rgba(90, 154, 90, 0.3);
+        }
+
+        .form-input::placeholder {
+            color: #b8d4b8;
+        }
+
+        .password-requirements {
+            background: rgba(46, 125, 46, 0.1);
+            border: 1px solid rgba(90, 154, 90, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            color: #b8d4b8;
+        }
+
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement.met {
+            color: #4CAF50;
+        }
+
+        .requirement-icon {
+            margin-right: 8px;
+            font-size: 10px;
+        }
+
+        .cultura-section {
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border: 1px solid #5a9a5a;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .cultura-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .cultura-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #8fbc8f 0%, #5a9a5a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .cultura-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8fbc8f;
+            margin-bottom: 2px;
+        }
+
+        .cultura-subtitle {
+            font-size: 12px;
+            color: #b8d4b8;
+        }
+
+        .cultura-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cultura-option {
+            display: flex;
+            align-items: center;
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cultura-option:hover {
+            background: rgba(46, 125, 46, 0.3);
+            border-color: #8fbc8f;
+        }
+
+        .cultura-option.selected {
+            background: rgba(90, 154, 90, 0.3);
+            border-color: #8fbc8f;
+        }
+
+        .radio-button {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #8fbc8f;
+            border-radius: 50%;
+            margin-right: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .radio-button.checked {
+            background: #8fbc8f;
+        }
+
+        .radio-button.checked::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #1a2e1a;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .option-desc {
+            font-size: 12px;
+            color: #b8d4b8;
+        }
+
+        .bonus-indicator {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #1a2e1a;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .terms-section {
+            margin: 20px 0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.5);
+            border-radius: 4px;
+            margin-right: 12px;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox.checked {
+            background: #8fbc8f;
+            border-color: #8fbc8f;
+            color: #1a2e1a;
+        }
+
+        .checkbox-label {
+            font-size: 13px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .terms-link {
+            color: #8fbc8f;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #5a9a5a 0%, #8fbc8f 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 18px;
+            margin: 20px 0;
+            color: #1a2e1a;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(90, 154, 90, 0.4);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .input-error {
+            border-color: #ff6b6b !important;
+            background: rgba(255, 107, 107, 0.1) !important;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+
+            <div class="header">
+                <div class="back-button" onclick="goBack()">←</div>
+                <div class="header-title">OPPRETT AGENT-KONTO</div>
+                <div style="width: 40px;"></div>
+            </div>
+
+            <div class="progress-indicator">
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+
+            <div class="form-container">
+                <div class="section-title">Bli en miljøagent!</div>
+                <div class="section-subtitle">Opprett din Agent-ID og begynn å gjøre en forskjell</div>
+
+                <div class="form-group">
+                    <label class="form-label">Fullt navn <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="fullName"
+                        placeholder="Ola Nordmann"
+                        onblur="validateName()"
+                    >
+                    <div class="error-message" id="nameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">E-postadresse <span class="required">*</span></label>
+                    <input 
+                        type="email" 
+                        class="form-input" 
+                        id="email"
+                        placeholder="ola@example.com"
+                        onblur="validateEmail()"
+                    >
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Opprett passord <span class="required">*</span></label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="password"
+                        placeholder="Minimum 8 tegn"
+                        oninput="validatePassword()"
+                    >
+                    <div class="password-requirements">
+                        <div class="requirement" id="req-length">
+                            <span class="requirement-icon">○</span>
+                            Minst 8 tegn
+                        </div>
+                        <div class="requirement" id="req-letter">
+                            <span class="requirement-icon">○</span>
+                            Minst én bokstav
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <span class="requirement-icon">○</span>
+                            Minst ett tall
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cultura-section">
+                    <div class="cultura-header">
+                        <div class="cultura-logo">🏦</div>
+                        <div>
+                            <div class="cultura-title">Cultura Bank-kobling</div>
+                            <div class="cultura-subtitle">Valgfritt, men gir bonuspoeng</div>
+                        </div>
+                    </div>
+
+                    <div class="cultura-options">
+                        <div class="cultura-option" onclick="selectCultura('customer')">
+                            <div class="radio-button" id="radio-customer"></div>
+                            <div class="option-content">
+                                <div class="option-title">Jeg er Cultura Bank-kunde</div>
+                                <div class="option-desc">Få 20 ekstra poeng per oppdrag</div>
+                            </div>
+                            <div class="bonus-indicator">+20 per oppdrag</div>
+                        </div>
+
+                        <div class="cultura-option" onclick="selectCultura('interested')">
+                            <div class="radio-button" id="radio-interested"></div>
+                            <div class="option-content">
+                                <div class="option-title">Jeg vurderer Cultura Bank</div>
+                                <div class="option-desc">Få tilgang til spesialtilbud</div>
+                            </div>
+                        </div>
+
+                        <div class="cultura-option" onclick="selectCultura('none')">
+                            <div class="radio-button" id="radio-none"></div>
+                            <div class="option-content">
+                                <div class="option-title">Kun miljøkonkurranse</div>
+                                <div class="option-desc">Delta uten bankforbindelse</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="terms-section">
+                    <div class="checkbox-group" onclick="toggleTerms()">
+                        <div class="checkbox" id="terms-checkbox"></div>
+                        <div class="checkbox-label">
+                            Jeg godtar <span class="terms-link" onclick="showTerms(event)">vilkårene</span> og <span class="terms-link" onclick="showPrivacy(event)">personvernreglene</span> for Operasjon Grønn Innsats
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group" onclick="toggleMarketing()">
+                        <div class="checkbox" id="marketing-checkbox"></div>
+                        <div class="checkbox-label">
+                            Jeg ønsker å motta e-post om nye oppdrag og konkurranser (valgfritt)
+                        </div>
+                    </div>
+                </div>
+
+                <button class="submit-button" id="submitBtn" onclick="createAccount()" disabled>
+                    🚀 OPPRETT AGENT-KONTO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedCultura = '';
+        let termsAccepted = false;
+        let marketingAccepted = false;
+
+        function validateName() {
+            const name = document.getElementById('fullName').value.trim();
+            const nameInput = document.getElementById('fullName');
+            const nameError = document.getElementById('nameError');
+            
+            if (name.length < 2) {
+                nameInput.classList.add('input-error');
+                nameError.textContent = 'Navn må være minst 2 tegn';
+                return false;
+            } else {
+                nameInput.classList.remove('input-error');
+                nameError.textContent = '';
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            const email = document.getElementById('email').value.trim();
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!emailRegex.test(email)) {
+                emailInput.classList.add('input-error');
+                emailError.textContent = 'Ugyldig e-postadresse';
+                return false;
+            } else {
+                emailInput.classList.remove('input-error');
+                emailError.textContent = '';
+                return true;
+            }
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            
+            // Check length
+            const lengthReq = document.getElementById('req-length');
+            if (password.length >= 8) {
+                lengthReq.classList.add('met');
+                lengthReq.querySelector('.requirement-icon').textContent = '✓';
+            } else {
+                lengthReq.classList.remove('met');
+                lengthReq.querySelector('.requirement-icon').textContent = '○';
+            }
+            
+            // Check letter
+            const letterReq = document.getElementById('req-letter');
+            if (/[a-zA-ZæøåÆØÅ]/.test(password)) {
+                letterReq.classList.add('met');
+                letterReq.querySelector('.requirement-icon').textContent = '✓';
+            } else {
+                letterReq.classList.remove('met');
+                letterReq.querySelector('.requirement-icon').textContent = '○';
+            }
+            
+            // Check number
+            const numberReq = document.getElementById('req-number');
+            if (/[0-9]/.test(password)) {
+                numberReq.classList.add('met');
+                numberReq.querySelector('.requirement-icon').textContent = '✓';
+            } else {
+                numberReq.classList.remove('met');
+                numberReq.querySelector('.requirement-icon').textContent = '○';
+            }
+            
+            updateSubmitButton();
+            return password.length >= 8 && /[a-zA-ZæøåÆØÅ]/.test(password) && /[0-9]/.test(password);
+        }
+
+        function selectCultura(type) {
+            selectedCultura = type;
+            
+            // Clear all selections
+            document.querySelectorAll('.cultura-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelectorAll('.radio-button').forEach(radio => {
+                radio.classList.remove('checked');
+            });
+            
+            // Select the chosen option
+            const selectedOption = document.querySelector(`[onclick="selectCultura('${type}')"]`);
+            selectedOption.classList.add('selected');
+            document.getElementById(`radio-${type}`).classList.add('checked');
+            
+            updateSubmitButton();
+        }
+
+        function toggleTerms() {
+            termsAccepted = !termsAccepted;
+            const checkbox = document.getElementById('terms-checkbox');
+            
+            if (termsAccepted) {
+                checkbox.classList.add('checked');
+                checkbox.textContent = '✓';
+            } else {
+                checkbox.classList.remove('checked');
+                checkbox.textContent = '';
+            }
+            
+            updateSubmitButton();
+        }
+
+        function toggleMarketing() {
+            marketingAccepted = !marketingAccepted;
+            const checkbox = document.getElementById('marketing-checkbox');
+            
+            if (marketingAccepted) {
+                checkbox.classList.add('checked');
+                checkbox.textContent = '✓';
+            } else {
+                checkbox.classList.remove('checked');
+                checkbox.textContent = '';
+            }
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const isFormValid = validateFormCompleteness();
+            
+            submitBtn.disabled = !isFormValid;
+        }
+
+        function validateFormCompleteness() {
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            return name.length >= 2 && 
+                   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && 
+                   password.length >= 8 && 
+                   /[a-zA-ZæøåÆØÅ]/.test(password) && 
+                   /[0-9]/.test(password) &&
+                   termsAccepted;
+        }
+
+        function showTerms(event) {
+            event.stopPropagation();
+            alert('Vilkår for Operasjon Grønn Innsats:\n\n• Ærlig rapportering av miljøoppdrag\n• Respektfull oppførsel i konkurranser\n• Ingen manipulering av poengberegning\n• Cultura Bank forbeholder seg retten til å moderere innhold\n• Trekninger er endelige og kan ikke ankes');
+        }
+
+        function showPrivacy(event) {
+            event.stopPropagation();
+            alert('Personvernregler (GDPR-kompatibel):\n\n• Vi samler kun nødvendig informasjon\n• Data deles ikke med tredjeparter\n• Du kan slette kontoen når som helst\n• Bilder og tips kan brukes i markedsføring (med samtykke)\n• Se fullstendig personvernerklæring på cultura.no/personvern');
+        }
+
+        function createAccount() {
+            if (!validateFormCompleteness()) {
+                alert('Vennligst fyll ut alle påkrevde felt korrekt.');
+                return;
+            }
+            
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            // Generate Agent ID
+            const agentId = Math.floor(1000 + Math.random() * 9000);
+            
+            alert(`🎉 AGENT-KONTO OPPRETTET!\n\nDin Agent-ID: #${agentId}\nNavn: ${name}\nE-post: ${email}\nCultura-status: ${getCulturaStatusText()}\n\nNeste steg: Bekreft e-post og sett opp profil`);
+            
+            // Navigate to next step
+            setTimeout(() => {
+                alert('Navigerer til e-post bekreftelse og profil-oppsett...');
+            }, 1000);
+        }
+
+        function getCulturaStatusText() {
+            switch(selectedCultura) {
+                case 'customer': return 'Kunde (+20 poeng per oppdrag)';
+                case 'interested': return 'Interessert i Cultura Bank';
+                case 'none': return 'Kun miljøkonkurranse';
+                default: return 'Ikke valgt';
+            }
+        }
+
+        // Enable real-time validation
+        document.getElementById('fullName').addEventListener('input', updateSubmitButton);
+        document.getElementById('email').addEventListener('input', updateSubmitButton);
+        document.getElementById('password').addEventListener('input', updateSubmitButton);
+    </script>
+</body>
+</html> goBack() {
+            alert('Tilbake til velkomstskjerm...');
+        }
+
+        function

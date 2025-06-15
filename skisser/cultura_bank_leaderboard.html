@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledertavle - Operasjon Grønn Innsats</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8fbc8f;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: #b8d4b8;
+        }
+
+        .time-period {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px;
+        }
+
+        .period-tab {
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #b8d4b8;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-tab.active {
+            background: rgba(46, 125, 46, 0.4);
+            border-color: #5a9a5a;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .top-three {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .podium-place {
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .podium-place.first {
+            order: 2;
+            transform: scale(1.1);
+        }
+
+        .podium-place.second {
+            order: 1;
+            transform: scale(0.95);
+        }
+
+        .podium-place.third {
+            order: 3;
+            transform: scale(0.95);
+        }
+
+        .podium-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a2e1a;
+            position: relative;
+        }
+
+        .podium-place.first .podium-avatar {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .podium-place.second .podium-avatar {
+            background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+            color: #2c2c2c;
+        }
+
+        .podium-place.third .podium-avatar {
+            background: linear-gradient(135deg, #CD7F32 0%, #B8860B 100%);
+            color: #2c2c2c;
+        }
+
+        .crown {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            animation: crown-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes crown-glow {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+
+        .podium-name {
+            font-size: 12px;
+            color: #8fbc8f;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .podium-points {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .podium-rank {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .podium-place.first .podium-rank {
+            color: #FFD700;
+        }
+
+        .podium-place.second .podium-rank {
+            color: #C0C0C0;
+        }
+
+        .podium-place.third .podium-rank {
+            color: #CD7F32;
+        }
+
+        .threshold-info {
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border: 1px solid #5a9a5a;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .threshold-title {
+            font-size: 16px;
+            color: #8fbc8f;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .threshold-details {
+            font-size: 14px;
+            color: #b8d4b8;
+            line-height: 1.4;
+        }
+
+        .leaderboard-list {
+            padding: 0 20px 100px 20px;
+        }
+
+        .rank-item {
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .rank-item.user-highlight {
+            background: rgba(90, 154, 90, 0.3);
+            border-color: #5a9a5a;
+            transform: translateX(5px);
+        }
+
+        .rank-item.user-highlight::before {
+            content: '👤';
+            position: absolute;
+            left: -10px;
+            font-size: 16px;
+        }
+
+        .rank-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(90, 154, 90, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #ffffff;
+            margin-right: 15px;
+            font-size: 14px;
+        }
+
+        .rank-item.top-ten .rank-number {
+            background: linear-gradient(135deg, #8fbc8f 0%, #5a9a5a 100%);
+            color: #1a2e1a;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .user-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .badge {
+            background: rgba(90, 154, 90, 0.3);
+            color: #8fbc8f;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .user-points {
+            text-align: right;
+        }
+
+        .points-value {
+            font-size: 18px;
+            color: #8fbc8f;
+            font-weight: 700;
+        }
+
+        .points-label {
+            font-size: 11px;
+            color: #b8d4b8;
+            margin-top: 2px;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(90, 154, 90, 0.2);
+            border-radius: 0 0 20px 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8fbc8f;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+        }
+
+        .nav-item:hover {
+            background: rgba(90, 154, 90, 0.2);
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+            background: rgba(90, 154, 90, 0.3);
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            background: rgba(143, 188, 143, 0.2);
+        }
+
+        .floating-elements {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.1;
+            color: #8fbc8f;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .element-1 { top: 100px; left: 20px; animation-delay: 0s; }
+        .element-2 { top: 200px; right: 20px; animation-delay: 3s; }
+        .element-3 { top: 350px; left: 30px; animation-delay: 6s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .stats-summary {
+            background: rgba(46, 125, 46, 0.15);
+            border: 1px solid rgba(90, 154, 90, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #8fbc8f;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #b8d4b8;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="floating-elements element-1">🏆</div>
+            <div class="floating-elements element-2">🎖️</div>
+            <div class="floating-elements element-3">⭐</div>
+
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+
+            <div class="header">
+                <div class="header-title">🏆 LEDERTAVLE</div>
+                <div class="header-subtitle">Månedlige toppagenter</div>
+            </div>
+
+            <div class="time-period">
+                <div class="period-tab">Desember</div>
+                <div class="period-tab active">Januar</div>
+                <div class="period-tab">Februar</div>
+            </div>
+
+            <div class="top-three">
+                <div class="podium-place second">
+                    <div class="podium-rank">#2</div>
+                    <div class="podium-avatar">LH</div>
+                    <div class="podium-name">Lars Hansen</div>
+                    <div class="podium-points">285 poeng</div>
+                </div>
+                
+                <div class="podium-place first">
+                    <div class="crown">👑</div>
+                    <div class="podium-rank">#1</div>
+                    <div class="podium-avatar">MN</div>
+                    <div class="podium-name">Maria Nordahl</div>
+                    <div class="podium-points">320 poeng</div>
+                </div>
+                
+                <div class="podium-place third">
+                    <div class="podium-rank">#3</div>
+                    <div class="podium-avatar">KS</div>
+                    <div class="podium-name">Kari Solberg</div>
+                    <div class="podium-points">270 poeng</div>
+                </div>
+            </div>
+
+            <div class="threshold-info">
+                <div class="threshold-title">🎯 Trekning kvalifisering</div>
+                <div class="threshold-details">
+                    Topp 78 agenter (50%) kvalifiserer for månedens trekning.<br>
+                    Minimumscore: <strong>145 poeng</strong>
+                </div>
+            </div>
+
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <div class="stat-value">156</div>
+                    <div class="stat-label">Aktive agenter</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">78</div>
+                    <div class="stat-label">I trekning</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">892</div>
+                    <div class="stat-label">Totale oppdrag</div>
+                </div>
+            </div>
+
+            <div class="leaderboard-list">
+                <div class="rank-item top-ten">
+                    <div class="rank-number">4</div>
+                    <div class="user-info">
+                        <div class="user-name">Ola Eriksen</div>
+                        <div class="user-badges">
+                            <span class="badge">Reparatør</span>
+                            <span class="badge">Cultura</span>
+                        </div>
+                    </div>
+                    <div class="user-points">
+                        <div class="points-value">245</div>
+                        <div class="points-label">poeng</div>
+                    </div>
+                </div>
+
+                <div class="rank-item top-ten">
+                    <div class="rank-number">5</div>
+                    <div class="user-info">
+                        <div class="user-name">Emma Johansen</div>
+                        <div class="user-badges">
+                            <span class="badge">Matmester</span>
+                        </div>
+                    </div>
+                    <div class="user-points">
+                        <div class="points-value">230</div>
+                        <div class="points-label">poeng</div>
+                    </div>
+                </div>
+
+                <div class="rank-item top-ten">
+                    <div class="rank-number">6</div>
+                    <div class="user-info">
+                        <div class="user-name">Thomas Lie</div>
+                        <div class="user-badges">
+                            <span class="badge">Kunnskaps-agent</span>
+                            <span class="badge">Cultura</span>
+                        </div>
+                    </div>
+                    <div class="user-points">
+                        <div class="points-value">215</div>
+                        <div class="points-label">poeng</div>
+                    </div>
+                </div>
+
+                <div class="rank-item user-highlight">
+                    <div class="rank-number">18</div>
+                    <div class="user-info">
+                        <div class="user-name">Du (Agent #1247)</div>
+                        <div class="user-badges">
+                            <span class="badge">Kunnskaps-agent</span>
+                            <span class="badge">Cultura</span>
+                        </div>
+                    </div>
+                    <div class="user-points">
+                        <div class="points-value">190</div>
+                        <div class="points-label">poeng</div>
+                    </div>
+                </div>
+
+                <div class="rank-item">
+                    <div class="rank-number">19</div>
+                    <div class="user-info">
+                        <div class="user-name">Anne Bakken</div>
+                        <div class="user-badges">
+                            <span class="badge">Handleguru</span>
+                        </div>
+                    </div>
+                    <div class="user-points">
+                        <div class="points-value">185</div>
+                        <div class="points-label">poeng</div>
+                    </div>
+                </div>
+
+                <div class="rank-item">
+                    <div class="rank-number">78</div>
+                    <div class="user-info">
+                        <div class="user-name">Per Moen</div>
+                        <div class="user-badges">
+                            <span class="badge">Nybegynner</span>
+                        </div>
+                    </div>
+                    <div class="user-points">
+                        <div class="points-value">145</div>
+                        <div class="points-label">poeng (grense)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="navigateTo('home')">
+                    <div class="nav-icon">🏠</div>
+                    <span>Senter</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('stats')">
+                    <div class="nav-icon">📊</div>
+                    <span>Status</span>
+                </div>
+                <div class="nav-item active" onclick="navigateTo('leaderboard')">
+                    <div class="nav-icon">🏆</div>
+                    <span>Ledere</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('profile')">
+                    <div class="nav-icon">👤</div>
+                    <span>Profil</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigasjon
+        function navigateTo(page) {
+            switch(page) {
+                case 'home':
+                    alert('Navigerer til hovedskjerm (oppgaveliste)...');
+                    break;
+                case 'stats':
+                    alert('Navigerer til din personlige status og statistikk...');
+                    break;
+                case 'leaderboard':
+                    // Allerede på ledertavle
+                    break;
+                case 'profile':
+                    alert('Navigerer til profil og innstillinger...');
+                    break;
+            }
+        }
+
+        // Simuler månedlig bytte
+        function switchMonth(month) {
+            // I ekte app: last inn data for valgt måned
+            console.log('Switching to month:', month);
+        }
+
+        // Animasjon for podium
+        setTimeout(() => {
+            const podiumPlaces = document.querySelectorAll('.podium-place');
+            podiumPlaces.forEach((place, index) => {
+                setTimeout(() => {
+                    place.style.transform += ' translateY(-10px)';
+                    setTimeout(() => {
+                        place.style.transform = place.style.transform.replace(' translateY(-10px)', '');
+                    }, 300);
+                }, index * 200);
+            });
+        }, 500);
+    </script>
+</body>
+</html>

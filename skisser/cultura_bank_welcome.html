@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velkommen - Operasjon Grønn Innsats</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .hero-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .floating-elements {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.3;
+            color: #8fbc8f;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .element-1 { top: 80px; left: 30px; animation-delay: 0s; }
+        .element-2 { top: 120px; right: 40px; animation-delay: 2s; }
+        .element-3 { top: 200px; left: 50px; animation-delay: 4s; }
+        .element-4 { top: 250px; right: 30px; animation-delay: 6s; }
+        .element-5 { bottom: 200px; left: 40px; animation-delay: 1s; }
+        .element-6 { bottom: 160px; right: 50px; animation-delay: 3s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(10deg); opacity: 0.6; }
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #5a9a5a 0%, #8fbc8f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(90, 154, 90, 0.4);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(90, 154, 90, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(90, 154, 90, 0.6); }
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #8fbc8f;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .app-subtitle {
+            font-size: 18px;
+            color: #b8d4b8;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .description {
+            font-size: 16px;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 300px;
+        }
+
+        .feature-highlights {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .feature-text {
+            font-size: 12px;
+            color: #b8d4b8;
+            font-weight: 600;
+        }
+
+        .cultura-partnership {
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border: 1px solid #5a9a5a;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .partnership-logo {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .partnership-text {
+            font-size: 14px;
+            color: #8fbc8f;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .partnership-desc {
+            font-size: 12px;
+            color: #b8d4b8;
+        }
+
+        .action-buttons {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5a9a5a 0%, #8fbc8f 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 18px;
+            color: #1a2e1a;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(90, 154, 90, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #8fbc8f;
+            border-radius: 15px;
+            padding: 16px;
+            color: #8fbc8f;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(90, 154, 90, 0.2);
+            color: #ffffff;
+        }
+
+        .terms-text {
+            font-size: 11px;
+            color: #b8d4b8;
+            text-align: center;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .terms-link {
+            color: #8fbc8f;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .beta-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #1a2e1a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="floating-elements element-1">🌱</div>
+            <div class="floating-elements element-2">🏆</div>
+            <div class="floating-elements element-3">🥗</div>
+            <div class="floating-elements element-4">🔧</div>
+            <div class="floating-elements element-5">🛒</div>
+            <div class="floating-elements element-6">💡</div>
+
+            <div class="beta-indicator">Beta</div>
+
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+
+            <div class="hero-section">
+                <div class="logo">🌍</div>
+                
+                <div class="app-title">OPERASJON<br>GRØNN INNSATS</div>
+                <div class="app-subtitle">Gjør en forskjell. Tjen poeng. Vinn premier.</div>
+                
+                <div class="description">
+                    Delta i Norges største miljøkonkurranse! Fullfør enkle miljøoppdrag, sammenlign deg med andre og kvalifiser for månedlige trekninger.
+                </div>
+
+                <div class="feature-highlights">
+                    <div class="feature">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">Enkle oppdrag</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🏆</div>
+                        <div class="feature-text">Konkurranser</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🎁</div>
+                        <div class="feature-text">Premier</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cultura-partnership">
+                <div class="partnership-logo">🏦</div>
+                <div class="partnership-text">I samarbeid med Cultura Bank</div>
+                <div class="partnership-desc">Cultura Bank-kunder får 20 ekstra poeng per oppdrag</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="startRegistration()">
+                    🚀 BEGYNN REISEN
+                </button>
+                <button class="btn-secondary" onclick="showLogin()">
+                    Har du allerede konto? Logg inn
+                </button>
+                
+                <div class="terms-text">
+                    Ved å fortsette godtar du våre <span class="terms-link" onclick="showTerms()">vilkår</span> og <span class="terms-link" onclick="showPrivacy()">personvernregler</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startRegistration() {
+            alert('Navigerer til registrering...\n\nVi skal nå:\n1. Samle inn grunnleggende info\n2. Knytte til Cultura Bank (hvis kunde)\n3. Sette opp profil\n4. Vise hvordan appen fungerer');
+        }
+
+        function showLogin() {
+            alert('Navigerer til innlogging...\n\nFor eksisterende brukere som allerede har opprettet Agent-ID og passord.');
+        }
+
+        function showTerms() {
+            alert('Åpner vilkår for bruk...\n\nInkluderer:\n• Regler for konkurranser\n• Poengberegning\n• Innholdspolicy\n• Brukeroppførsel');
+        }
+
+        function showPrivacy() {
+            alert('Åpner personvernregler...\n\nGDPR-kompatibel informasjon om:\n• Datainnsamling\n• Cookies\n• Bildehåndtering\n• Rett til sletting');
+        }
+
+        // Animate logo on load
+        setTimeout(() => {
+            const logo = document.querySelector('.logo');
+            logo.style.animation = 'logoPulse 3s ease-in-out infinite, float 8s ease-in-out infinite';
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Økologisk Handel Fullført</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0d1929 0%, #1a2f4a 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0d1929 0%, #1a2f4a 100%);
+            border-radius: 20px;
+            overflow-y: auto;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2196F3;
+        }
+
+        .success-animation {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 60px;
+            animation: successPulse 2s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(33, 150, 243, 0.5);
+        }
+
+        @keyframes successPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(33, 150, 243, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(33, 150, 243, 0.8); }
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .success-subtitle {
+            font-size: 16px;
+            color: #90CAF9;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .mission-summary {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.3) 0%, rgba(30, 136, 229, 0.2) 100%);
+            border: 1px solid #2196F3;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-summary::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(33,150,243,0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .summary-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .mission-icon-small {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 24px;
+        }
+
+        .mission-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .mission-category {
+            font-size: 14px;
+            color: #90CAF9;
+        }
+
+        .shopping-preview {
+            background: rgba(25, 118, 210, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .shopping-title {
+            font-size: 14px;
+            color: #2196F3;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .shopping-content {
+            font-size: 15px;
+            color: #ffffff;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .products-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .product-item {
+            background: rgba(33, 150, 243, 0.2);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #90CAF9;
+            text-align: center;
+        }
+
+        .points-earned {
+            background: rgba(33, 150, 243, 0.3);
+            border: 2px solid #2196F3;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .points-label {
+            font-size: 14px;
+            color: #90CAF9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .points-amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .points-breakdown {
+            font-size: 12px;
+            color: #90CAF9;
+            line-height: 1.4;
+        }
+
+        .status-update {
+            background: rgba(25, 118, 210, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-label {
+            font-size: 14px;
+            color: #90CAF9;
+        }
+
+        .status-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .rank-indicator {
+            display: inline-block;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #0d1929;
+        }
+
+        .achievement-badge {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.4) 0%, rgba(129, 199, 132, 0.3) 100%);
+            border: 1px solid #4CAF50;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+            animation: badgeGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(76, 175, 80, 0.6); }
+        }
+
+        .badge-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .badge-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 4px;
+        }
+
+        .badge-desc {
+            font-size: 12px;
+            color: #81C784;
+        }
+
+        .shopping-impact {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.3) 0%, rgba(129, 199, 132, 0.2) 100%);
+            border: 1px solid #4CAF50;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .impact-title {
+            font-size: 14px;
+            color: #4CAF50;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .impact-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .impact-stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #81C784;
+            margin-top: 2px;
+        }
+
+        .action-buttons {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-primary {
+            flex: 2;
+            background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 18px;
+            color: #0d1929;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196F3;
+            border-radius: 15px;
+            padding: 18px;
+            color: #2196F3;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(33, 150, 243, 0.3);
+        }
+
+        .floating-elements {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.2;
+            color: #2196F3;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .element-1 { top: 150px; left: 30px; animation-delay: 0s; }
+        .element-2 { top: 250px; right: 30px; animation-delay: 2s; }
+        .element-3 { top: 400px; left: 40px; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-15px) rotate(5deg); }
+            66% { transform: translateY(-8px) rotate(-3deg); }
+        }
+
+        .next-mission-hint {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px dashed rgba(33, 150, 243, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .hint-text {
+            font-size: 14px;
+            color: #90CAF9;
+            margin-bottom: 8px;
+        }
+
+        .hint-mission {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="floating-elements element-1">🛒</div>
+            <div class="floating-elements element-2">🥕</div>
+            <div class="floating-elements element-3">🌱</div>
+
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 100%</span>
+            </div>
+
+            <div class="header">
+                <div class="header-title">🛒 OPPDRAG FULLFØRT</div>
+            </div>
+
+            <div class="success-animation">
+                <div class="success-icon">✅</div>
+                <div class="success-title">Handleguru!</div>
+                <div class="success-subtitle">Din økologiske handlerunde er registrert! Takk for at du støtter bærekraftige produsenter og miljøvennlige valg.</div>
+            </div>
+
+            <div class="mission-summary">
+                <div class="summary-header">
+                    <div class="mission-icon-small">🛒</div>
+                    <div class="mission-name">Økologisk Handlerunde</div>
+                    <div class="mission-category">Butikk: Coop Extra</div>
+                </div>
+
+                <div class="shopping-preview">
+                    <div class="shopping-title">🛍️ Ditt økologiske kjøp:</div>
+                    <div class="shopping-content">7 økologiske produkter registrert</div>
+                    <div class="products-list">
+                        <div class="product-item">🍎 Økologiske epler</div>
+                        <div class="product-item">🥛 Økologisk melk</div>
+                        <div class="product-item">🍞 Økologisk brød</div>
+                        <div class="product-item">🍅 Økologiske tomater</div>
+                        <div class="product-item">🥕 Økologiske gulrøtter</div>
+                        <div class="product-item">🥚 Økologiske egg</div>
+                        <div class="product-item">🧈 Økologisk smør</div>
+                    </div>
+                </div>
+
+                <div class="points-earned">
+                    <div class="points-label">Poeng Opptjent</div>
+                    <div class="points-amount">40</div>
+                    <div class="points-breakdown">
+                        Grunnoppdrag (10) + Januar-bonus (5) + 7 produkter (10) + Dokumentasjon (10) + Lokalt (5)
+                    </div>
+                </div>
+
+                <div class="status-update">
+                    <div class="status-row">
+                        <span class="status-label">Totale poeng denne måned:</span>
+                        <span class="status-value">265</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Din plassering:</span>
+                        <span class="status-value">Agent #1247 - plass #12 av 156</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Status:</span>
+                        <span class="rank-indicator">🛒 TOPP 20%</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Økologiske produkter totalt:</span>
+                        <span class="status-value">15 denne måneden</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="achievement-badge">
+                <div class="badge-icon">🛒</div>
+                <div class="badge-title">Handleguru</div>
+                <div class="badge-desc">Første økologiske handlerunde fullført!</div>
+            </div>
+
+            <div class="shopping-impact">
+                <div class="impact-title">🌍 Påvirkning av ditt økologiske kjøp</div>
+                <div class="impact-stats">
+                    <div class="impact-stat">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">økologiske produkter</div>
+                    </div>
+                    <div class="impact-stat">
+                        <div class="stat-number">~2kg</div>
+                        <div class="stat-label">mindre kjemikalier</div>
+                    </div>
+                    <div class="impact-stat">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">totalt i januar</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="next-mission-hint">
+                <div class="hint-text">Neste anbefalte oppdrag:</div>
+                <div class="hint-mission">💡 Del et miljøtips</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="goToMissions()">
+                    🛒 NY HANDLERUNDE
+                </button>
+                <button class="btn-secondary" onclick="shareMission()">
+                    📤 DEL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToMissions() {
+            alert('Navigerer til oppgaveliste...');
+            // I ekte app: naviger tilbake til hovedskjerm
+        }
+
+        function shareMission() {
+            alert('Deling-funksjon åpnes...');
+            // I ekte app: åpne deling-dialog
+        }
+
+        // Simuler real-time oppdatering av plassering
+        setTimeout(() => {
+            const statusValue = document.querySelectorAll('.status-value')[1]; // Second status-value (plassering)
+            if (statusValue && statusValue.textContent.includes('plass #12')) {
+                statusValue.textContent = 'Agent #1247 - plass #11 av 156';
+                statusValue.style.color = '#2196F3';
+                statusValue.style.fontWeight = '700';
+            }
+        }, 3000);
+
+        // Animate impact numbers
+        setTimeout(() => {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                stat.style.fontSize = '20px';
+                stat.style.color = '#4CAF50';
+            });
+        }, 2000);
+    </script>
+</body>
+</html>

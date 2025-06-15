@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status - Operasjon Grønn Innsats</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        .content-area::after {
+            content: '';
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 355px;
+            height: 20px;
+            background: linear-gradient(to top, rgba(26, 46, 26, 0.8) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 90px;
+            right: 30px;
+            width: 30px;
+            height: 30px;
+            background: rgba(90, 154, 90, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+            opacity: 0.7;
+            animation: bounce 2s infinite;
+            z-index: 20;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+            60% { transform: translateY(-3px); }
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8fbc8f;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: #b8d4b8;
+        }
+
+        .current-status {
+            background: linear-gradient(135deg, rgba(46, 125, 46, 0.4) 0%, rgba(90, 154, 90, 0.2) 100%);
+            border: 1px solid #5a9a5a;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .status-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+            position: relative;
+            border-radius: 50%;
+            background: conic-gradient(#8fbc8f 0deg 270deg, rgba(90, 154, 90, 0.2) 270deg 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-ring::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%);
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .status-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .current-rank {
+            font-size: 28px;
+            font-weight: 800;
+            color: #FFD700;
+            margin-bottom: 2px;
+        }
+
+        .rank-label {
+            font-size: 11px;
+            color: #b8d4b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-details {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .status-item {
+            flex: 1;
+        }
+
+        .status-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #8fbc8f;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: #b8d4b8;
+            margin-top: 2px;
+        }
+
+        .chart-section {
+            margin: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #8fbc8f;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .title-icon {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .chart-container {
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            color: #8fbc8f;
+            font-weight: 600;
+        }
+
+        .chart-period {
+            font-size: 12px;
+            color: #b8d4b8;
+            background: rgba(90, 154, 90, 0.2);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .chart {
+            height: 100px;
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 4px;
+            padding: 10px 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #5a9a5a 0%, #8fbc8f 100%);
+            border-radius: 2px 2px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            filter: brightness(1.2);
+        }
+
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #8fbc8f;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .chart-bar:hover::after {
+            opacity: 1;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #b8d4b8;
+        }
+
+        .activity-feed {
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(90, 154, 90, 0.2);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 12px;
+        }
+
+        .activity-icon.repair {
+            background: linear-gradient(135deg, #ff4500 0%, #ff8c00 100%);
+        }
+
+        .activity-icon.food {
+            background: linear-gradient(135deg, #5a9a5a 0%, #8fbc8f 100%);
+        }
+
+        .activity-icon.shopping {
+            background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+        }
+
+        .activity-icon.tips {
+            background: linear-gradient(135deg, #FF8F00 0%, #FFC107 100%);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .activity-desc {
+            font-size: 12px;
+            color: #b8d4b8;
+            line-height: 1.3;
+        }
+
+        .activity-points {
+            font-size: 14px;
+            color: #8fbc8f;
+            font-weight: 700;
+        }
+
+        .goals-section {
+            margin: 20px;
+        }
+
+        .goal-item {
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .goal-title {
+            font-size: 14px;
+            color: #8fbc8f;
+            font-weight: 600;
+        }
+
+        .goal-status {
+            font-size: 12px;
+            color: #b8d4b8;
+        }
+
+        .goal-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(90, 154, 90, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .goal-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8fbc8f 0%, #5a9a5a 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .goal-reward {
+            font-size: 11px;
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        .insights-section {
+            margin: 20px;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3) 0%, rgba(255, 235, 59, 0.2) 100%);
+            border: 1px solid #FFC107;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .insight-card::before {
+            content: '💡';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            opacity: 0.6;
+        }
+
+        .insight-title {
+            font-size: 16px;
+            color: #FFC107;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .insight-text {
+            font-size: 14px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(90, 154, 90, 0.2);
+            border-radius: 0 0 20px 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8fbc8f;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+        }
+
+        .nav-item:hover {
+            background: rgba(90, 154, 90, 0.2);
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+            background: rgba(90, 154, 90, 0.3);
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            background: rgba(143, 188, 143, 0.2);
+        }
+
+        .streak-indicator {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .total-status {
+            background: rgba(46, 125, 46, 0.2);
+            border: 1px solid rgba(90, 154, 90, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .total-summary {
+            margin-top: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(90, 154, 90, 0.2);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #b8d4b8;
+        }
+
+        .summary-value {
+            font-size: 14px;
+            color: #8fbc8f;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="screen">
+            <div class="scroll-indicator" id="scroll-indicator">↓</div>
+
+            <div class="content-area" id="content-area">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>🔋 100%</span>
+                </div>
+
+                <div class="header">
+                    <div class="header-title">📊 DIN STATUS</div>
+                    <div class="header-subtitle">Agent #1247 • KlimaTiger</div>
+                </div>
+
+                <div class="current-status">
+                    <div class="section-title" style="margin-bottom: 15px; justify-content: center;">
+                        <span class="title-icon">📅</span>
+                        Januar 2025 - Månedens status
+                    </div>
+                    <div class="status-ring">
+                        <div class="status-content">
+                            <div class="current-rank">#18</div>
+                            <div class="rank-label">PLASSERING</div>
+                        </div>
+                    </div>
+                    <div class="status-details">
+                        <div class="status-item">
+                            <div class="status-value">190</div>
+                            <div class="status-label">Poeng jan</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value">✅</div>
+                            <div class="status-label">Kvalifisert</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value">6/8</div>
+                            <div class="status-label">Oppdrag</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="total-status">
+                    <div class="section-title">
+                        <span class="title-icon">🏆</span>
+                        Hele perioden (2025)
+                    </div>
+                    <div class="total-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Hittil i år, poeng totalt:</span>
+                            <span class="summary-value">190</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Oppdrag fullført:</span>
+                            <span class="summary-value">6 av 96 mulige</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Beste månedsplassering:</span>
+                            <span class="summary-value">#18 (januar)</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Kvalifisert for trekninger:</span>
+                            <span class="summary-value">1 av 12 måneder</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="goals-section">
+                    <div class="section-title">
+                        <span class="title-icon">🎯</span>
+                        Januar-mål
+                        <span class="streak-indicator">🔥 5 dager</span>
+                    </div>
+                    
+                    <div class="goal-item">
+                        <div class="goal-header">
+                            <div class="goal-title">Månedens 8 oppdrag</div>
+                            <div class="goal-status">6 av 8 fullført</div>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-fill" style="width: 75%"></div>
+                        </div>
+                        <div class="goal-reward">🏆 Bonus: 50 poeng ved fullføring</div>
+                    </div>
+
+                    <div class="goal-item">
+                        <div class="goal-header">
+                            <div class="goal-title">Januar trekning-kvalifisering</div>
+                            <div class="goal-status">190 av 145 poeng</div>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-fill" style="width: 100%"></div>
+                        </div>
+                        <div class="goal-reward">✅ Kvalifisert for januar-trekning!</div>
+                    </div>
+
+                    <div class="goal-item">
+                        <div class="goal-header">
+                            <div class="goal-title">Topp 10 i januar</div>
+                            <div class="goal-status">45 poeng til</div>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-fill" style="width: 65%"></div>
+                        </div>
+                        <div class="goal-reward">🥇 Topp 10 prestasjon + spesiell badge</div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="section-title">
+                        <span class="title-icon">📈</span>
+                        Januar poengutvikling
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Denne måneden</div>
+                            <div class="chart-period">Januar 2025</div>
+                        </div>
+                        <div class="chart">
+                            <div class="chart-bar" style="height: 20%" data-value="15"></div>
+                            <div class="chart-bar" style="height: 40%" data-value="35"></div>
+                            <div class="chart-bar" style="height: 30%" data-value="25"></div>
+                            <div class="chart-bar" style="height: 55%" data-value="45"></div>
+                            <div class="chart-bar" style="height: 35%" data-value="30"></div>
+                            <div class="chart-bar" style="height: 75%" data-value="60"></div>
+                            <div class="chart-bar" style="height: 45%" data-value="35"></div>
+                        </div>
+                        <div class="chart-labels">
+                            <span>Uke 1</span>
+                            <span>Uke 2</span>
+                            <span>Uke 3</span>
+                            <span>Uke 4</span>
+                            <span>Uke 5</span>
+                            <span>Uke 6</span>
+                            <span>Uke 7</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="section-title">
+                        <span class="title-icon">📅</span>
+                        Månedsoversikt (2025)
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Poeng per måned</div>
+                            <div class="chart-period">Hele året</div>
+                        </div>
+                        <div class="chart">
+                            <div class="chart-bar" style="height: 90%" data-value="190"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                            <div class="chart-bar" style="height: 0%" data-value="0"></div>
+                        </div>
+                        <div class="chart-labels">
+                            <span>Jan</span>
+                            <span>Feb</span>
+                            <span>Mar</span>
+                            <span>Apr</span>
+                            <span>Mai</span>
+                            <span>Jun</span>
+                            <span>Jul</span>
+                            <span>Aug</span>
+                            <span>Sep</span>
+                            <span>Okt</span>
+                            <span>Nov</span>
+                            <span>Des</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="section-title">
+                        <span class="title-icon">📋</span>
+                        Siste aktivitet
+                    </div>
+                    <div class="activity-feed">
+                        <div class="activity-item">
+                            <div class="activity-icon tips">💡</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Miljøtips delt</div>
+                                <div class="activity-desc">Energisparing: "Slå av ladere..."</div>
+                            </div>
+                            <div class="activity-points">+45</div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon shopping">🛒</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Økologisk handel</div>
+                                <div class="activity-desc">7 produkter registrert på Coop</div>
+                            </div>
+                            <div class="activity-points">+35</div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon repair">🔧</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Klær reparert</div>
+                                <div class="activity-desc">Sys hull i favorittkjolen</div>
+                            </div>
+                            <div class="activity-points">+40</div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-icon food">🥗</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Vegetar middag</div>
+                                <div class="activity-desc">Hjemmelaget pasta med grønnsaker</div>
+                            </div>
+                            <div class="activity-points">+30</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insights-section">
+                    <div class="section-title">
+                        <span class="title-icon">💡</span>
+                        Personlige innsikter
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-title">Sterk januar-start! 📈</div>
+                        <div class="insight-text">Du har 190 poeng på første måned - det er 27% over gjennomsnittet! Fortsett slik og du kan nå topp 5 før årsslutt.</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-title">11 måneder igjen 🗓️</div>
+                        <div class="insight-text">Med januar-innsatsen din som grunnlag, kan du potensielt samle over 2000 poeng i 2025. Det ville plassere deg i topp 3!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="navigateTo('home')">
+                    <div class="nav-icon">🏠</div>
+                    <span>Senter</span>
+                </div>
+                <div class="nav-item active" onclick="navigateTo('stats')">
+                    <div class="nav-icon">📊</div>
+                    <span>Status</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('leaderboard')">
+                    <div class="nav-icon">🏆</div>
+                    <span>Ledere</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('profile')">
+                    <div class="nav-icon">👤</div>
+                    <span>Profil</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(page) {
+            switch(page) {
+                case 'home':
+                    alert('Navigerer til hovedskjerm...');
+                    break;
+                case 'stats':
+                    // Already on stats
+                    break;
+                case 'leaderboard':
+                    alert('Navigerer til ledertavle...');
+                    break;
+                case 'profile':
+                    alert('Navigerer til profil...');
+                    break;
+            }
+        }
+
+        // Scroll indicator handling
+        const contentArea = document.getElementById('content-area');
+        const scrollIndicator = document.getElementById('scroll-indicator');
+        
+        contentArea.addEventListener('scroll', () => {
+            const scrollTop = contentArea.scrollTop;
+            
+            if (scrollTop > 50) {
+                scrollIndicator.style.opacity = '0';
+            } else {
+                scrollIndicator.style.opacity = '0.7';
+            }
+        });
+
+        // Animate progress bars on load
+        setTimeout(() => {
+            const progressBars = document.querySelectorAll('.goal-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        }, 1000);
+
+        // Animate chart bars on load
+        setTimeout(() => {
+            const chartBars = document.querySelectorAll('.chart-bar');
+            chartBars.forEach((bar, index) => {
+                const height = bar.style.height;
+                bar.style.height = '0%';
+                setTimeout(() => {
+                    bar.style.height = height;
+                }, index * 100);
+            });
+        }, 1500);
+    </script>
+</body>
+</html>
