@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miljøquiz Brettspill - Gnistfangeren.no</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>🌱 Miljøquiz Brettspill 🎲</h1>
+            <p>Test din miljøkunnskap mens du navigerer deg rundt brettet!</p>
+        </header>
+
+        <div id="opponentSelection" class="opponent-selection">
+            <h2>Velg din motspiller:</h2>
+            <div class="opponents">
+                <button class="opponent-btn" data-opponent="emma">
+                    <div class="opponent-icon">🌱</div>
+                    <h3>Øko-Emma</h3>
+                    <p>Miljøeksperten</p>
+                    <small>Svarer riktig 85% av tiden</small>
+                </button>
+                <button class="opponent-btn" data-opponent="geir">
+                    <div class="opponent-icon">🌿</div>
+                    <h3>Grønne-Geir</h3>
+                    <p>Litt miljøinteressert</p>
+                    <small>Svarer riktig 60% av tiden</small>
+                </button>
+                <button class="opponent-btn" data-opponent="simen">
+                    <div class="opponent-icon">💨</div>
+                    <h3>Slappe-Simen</h3>
+                    <p>Den late</p>
+                    <small>Svarer riktig 25% av tiden</small>
+                </button>
+            </div>
+        </div>
+
+        <div id="gameMessage" class="game-message hidden">
+            <!-- Spillmeldinger vises her -->
+        </div>
+
+        <div class="game-board">
+            <svg id="gameBoard" class="board" viewBox="0 0 1120 1120" xmlns="http://www.w3.org/2000/svg" aria-labelledby="title desc" role="img">
+                <title id="title">Miljøquiz Brettspill - Gnistfangeren.no</title>
+                <desc id="desc">Responsivt vektorbrett med tall, stiger og slanger.</desc>
+
+                <rect x="0" y="0" width="1120" height="1120" fill="#fdfaf3"></rect>
+
+                <!-- 60px margin rundt spilleflaten -->
+                <g id="root" transform="translate(60,60)">
+                    <g id="checker"></g>
+                    <g id="grid" stroke="#2a2a2a" stroke-width="1.2" opacity="0.6"></g>
+                    <g id="numbers" fill="#1d1d1d" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" font-size="22"></g>
+                    <g id="ladders"></g>
+                    <g id="snakes"></g>
+                    <g id="players"></g>
+                </g>
+            </svg>
+        </div>
+
+        <div class="game-controls">
+            <div class="player-info">
+                <h3>🎯 Du</h3>
+                <p>Felt: <span id="playerPosition">1</span></p>
+                <p id="currentTurn" class="turn-indicator">Din tur!</p>
+                <button id="rollDice" class="dice-button">🎲 Kast terning</button>
+                <div id="playerDiceResult" class="dice-result"></div>
+            </div>
+
+            <div class="ai-info">
+                <h3 id="aiName">Motspiller</h3>
+                <p>Felt: <span id="aiPosition">1</span></p>
+                <p id="aiStatus" class="ai-status"></p>
+                <div id="aiDiceResult" class="dice-result"></div>
+            </div>
+        </div>
+
+        <div id="questionModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Miljøspørsmål</h3>
+                <p id="questionText"></p>
+                <div id="answerButtons" class="answer-buttons">
+                    <!-- Svaralternativer genereres av JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div id="gameMessage" class="game-message hidden">
+            <!-- Spillmeldinger vises her -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
