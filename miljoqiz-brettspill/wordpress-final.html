@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miljøquiz Brettspill - Gnistfangeren.no</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #4CAF50, #2E7D32); min-height: 100vh; color: #333; }
+        .game-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; margin-bottom: 30px; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        header h1 { color: #2E7D32; margin-bottom: 10px; font-size: 2.5em; }
+        header p { color: #666; font-size: 1.1em; }
+        .opponent-selection { background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        .opponent-selection h2 { color: #2E7D32; margin-bottom: 25px; font-size: 1.8em; }
+        .opponents { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .opponent-btn { background: #E8F5E8; border: 3px solid #4CAF50; border-radius: 15px; padding: 20px; cursor: pointer; transition: all 0.3s ease; text-align: center; }
+        .opponent-btn:hover { background: #C8E6C9; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .opponent-btn.selected { background: #4CAF50; color: white; }
+        .opponent-icon { font-size: 3em; margin-bottom: 10px; }
+        .opponent-btn h3 { margin: 10px 0; color: inherit; }
+        .opponent-btn p { margin: 5px 0; font-weight: bold; }
+        .opponent-btn small { color: #666; font-style: italic; }
+        .opponent-btn.selected small { color: #E8F5E8; }
+        .opponent-selection.hidden { display: none; }
+        .game-board { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .board { width: min(90vmin, 700px); height: auto; aspect-ratio: 1; margin: 0 auto; display: block; }
+        .game-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .player-info, .ai-info { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        .turn-indicator { color: #4CAF50; font-weight: bold; }
+        .ai-status { color: #666; font-style: italic; }
+        .player-info h3 { color: #2E7D32; margin-bottom: 15px; font-size: 1.5em; }
+        .player-info p { margin-bottom: 10px; font-size: 1.1em; }
+        .dice-button { background: linear-gradient(135deg, #4CAF50, #66BB6A); color: white; border: none; border-radius: 50px; padding: 12px 24px; font-size: 1em; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 10px; width: 100%; }
+        .dice-button:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
+        .dice-button:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .dice-result { margin-top: 10px; font-size: 1.2em; font-weight: bold; color: #2E7D32; min-height: 30px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.hidden { display: none; }
+        .modal-content { background: white; border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 8px 12px rgba(0,0,0,0.2); min-height: 400px; display: flex; flex-direction: column; justify-content: space-between; }
+        .modal-content h3 { color: #2E7D32; margin-bottom: 20px; font-size: 1.8em; }
+        .modal-content p { margin-bottom: 25px; font-size: 1.1em; line-height: 1.5; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .answer-buttons { display: grid; gap: 10px; }
+        .answer-button { background: #E8F5E8; border: 2px solid #4CAF50; border-radius: 10px; padding: 15px; font-size: 1em; cursor: pointer; transition: all 0.3s ease; }
+        .answer-button:hover { background: #4CAF50; color: white; }
+        .answer-button.correct { background: #4CAF50; color: white; }
+        .answer-button.incorrect { background: #F44336; color: white; }
+        .game-message { background: white; border-radius: 15px; padding: 15px 20px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.15); font-size: 1.2em; font-weight: bold; margin-bottom: 20px; border-left: 5px solid #4CAF50; animation: slideIn 0.3s ease-out; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .game-message.hidden { visibility: hidden; opacity: 0; }
+        .game-message.success { background: #C8E6C9; color: #2E7D32; border-left-color: #4CAF50; }
+        .game-message.error { background: #FFCDD2; color: #C62828; border-left-color: #F44336; }
+        @media (max-width: 768px) { .game-container { padding: 10px; } .game-controls { grid-template-columns: 1fr; } header h1 { font-size: 2em; } }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>🌱 Miljøquiz Brettspill 🎲</h1>
+            <p>Test din miljøkunnskap mens du navigerer deg rundt brettet!</p>
+        </header>
+
+        <div id="opponentSelection" class="opponent-selection">
+            <h2>Velg din motspiller:</h2>
+            <div class="opponents">
+                <button class="opponent-btn" data-opponent="emma">
+                    <div class="opponent-icon">🌱</div>
+                    <h3>Øko-Emma</h3>
+                    <p>Miljøeksperten</p>
+                    <small>Svarer riktig 85% av tiden</small>
+                </button>
+                <button class="opponent-btn" data-opponent="geir">
+                    <div class="opponent-icon">🌿</div>
+                    <h3>Grønne-Geir</h3>
+                    <p>Litt miljøinteressert</p>
+                    <small>Svarer riktig 60% av tiden</small>
+                </button>
+                <button class="opponent-btn" data-opponent="simen">
+                    <div class="opponent-icon">💨</div>
+                    <h3>Slappe-Simen</h3>
+                    <p>Den late</p>
+                    <small>Svarer riktig 25% av tiden</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <svg id="gameBoard" class="board" viewBox="0 0 1120 1120" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="1120" height="1120" fill="#fdfaf3"></rect>
+                <g id="root" transform="translate(60,60)">
+                    <g id="checker"></g>
+                    <g id="grid" stroke="#2a2a2a" stroke-width="1.2" opacity="0.6"></g>
+                    <g id="numbers" fill="#1d1d1d" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial" font-size="22"></g>
+                    <g id="ladders"></g>
+                    <g id="snakes"></g>
+                    <g id="players"></g>
+                </g>
+            </svg>
+        </div>
+
+        <div id="gameMessage" class="game-message hidden"></div>
+
+        <div class="game-controls">
+            <div class="player-info">
+                <h3>🎯 Du</h3>
+                <p>Felt: <span id="playerPosition">1</span></p>
+                <p id="currentTurn" class="turn-indicator">Din tur!</p>
+                <button id="rollDice" class="dice-button">🎲 Kast terning</button>
+                <div id="playerDiceResult" class="dice-result"></div>
+            </div>
+
+            <div class="ai-info">
+                <h3 id="aiName">Motspiller</h3>
+                <p>Felt: <span id="aiPosition">1</span></p>
+                <p id="aiStatus" class="ai-status"></p>
+                <div id="aiDiceResult" class="dice-result"></div>
+            </div>
+        </div>
+
+        <div id="questionModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Miljøspørsmål</h3>
+                <p id="questionText"></p>
+                <div id="answerButtons" class="answer-buttons"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+class MiljoQuizGame {
+    constructor() {
+        this.boardSize = 100;
+        this.playerPosition = 1;
+        this.aiPosition = 1;
+        this.currentPlayer = 'human';
+        this.selectedOpponent = null;
+        this.usedQuestions = new Set();
+        this.gameStarted = false;
+        
+        this.ladders = [
+            {from: 4, to: 38, name: 'Første stige'},
+            {from: 14, to: 68, name: 'Lang stige'},
+            {from: 19, to: 60, name: 'Middels stige'},
+            {from: 30, to: 52, name: 'Kort stige'},
+            {from: 45, to: 75, name: 'Høy stige'},
+            {from: 58, to: 82, name: 'Siste stige'}
+        ];
+        
+        this.snakes = [
+            {from: 33, to: 9, name: 'Første slange'},
+            {from: 54, to: 46, name: 'Kort slange'},
+            {from: 80, to: 42, name: 'Lang slange'},
+            {from: 88, to: 67, name: 'Middels slange'},
+            {from: 95, to: 76, name: 'Stor slange'},
+            {from: 98, to: 25, name: 'Siste slange'}
+        ];
+        
+        this.questions = [
+            {question: "Hvor mye av verdens søppel består av plast?", answers: ["10%", "25%", "40%", "55%"], correct: 0, explanation: "Omtrent 10% av alt søppel består av plast, men det tar hundrevis av år å brytes ned."},
+            {question: "Hva er den største kilden til CO2-utslipp globalt?", answers: ["Transport", "Energiproduksjon", "Industri", "Landbruk"], correct: 1, explanation: "Energiproduksjon, hovedsakelig fra fossile brennstoffer, står for omtrent 25% av globale utslipp."},
+            {question: "Hvor mange liter vann trengs for å produsere 1 kg storfekjøtt?", answers: ["500 liter", "2000 liter", "8000 liter", "15000 liter"], correct: 3, explanation: "Det trengs omtrent 15000 liter vann for å produsere 1 kg storfekjøtt."},
+            {question: "Hvilken type energi produserer mest strøm i Norge?", answers: ["Vannkraft", "Vindkraft", "Solkraft", "Atomkraft"], correct: 0, explanation: "Norge produserer over 95% av sin elektrisitet fra vannkraft."},
+            {question: "Hvor lang tid tar det for en plastflaske å brytes ned naturlig?", answers: ["10 år", "50 år", "200 år", "450 år"], correct: 3, explanation: "En plastflaske kan ta opptil 450 år å brytes ned helt naturlig."},
+            {question: "Hva er den mest effektive måten å redusere personlig karbonavtrykk?", answers: ["Spise mindre kjøtt", "Fly mindre", "Bruke mindre strøm", "Resirkulere mer"], correct: 1, explanation: "Å redusere flyreiser har størst effekt på personlig karbonavtrykk."},
+            {question: "Hvor mye av jordens ferskvann er tilgjengelig for menneskelig bruk?", answers: ["30%", "10%", "3%", "1%"], correct: 3, explanation: "Bare omtrent 1% av jordens ferskvann er tilgjengelig for menneskelig bruk."},
+            {question: "Hvilket land produserer mest fornybar energi per innbygger?", answers: ["Norge", "Island", "Danmark", "Sverige"], correct: 1, explanation: "Island produserer mest fornybar energi per innbygger, hovedsakelig fra geotermisk energi."},
+            {question: "Hvor mye energi kan man spare ved å senke romtemperaturen med 1 grad?", answers: ["2%", "5%", "7%", "10%"], correct: 2, explanation: "Man kan spare omtrent 7% energi ved å senke romtemperaturen med bare 1 grad."},
+            {question: "Hva er den vanligste årsaken til skogbrann?", answers: ["Lyn", "Menneskelig aktivitet", "Spontan antennelse", "Vulkaner"], correct: 1, explanation: "Over 80% av skogbranner skyldes menneskelig aktivitet."},
+            {question: "Hvor mange tonn CO2 slipper en gjennomsnittsnordmann ut per år?", answers: ["5 tonn", "8 tonn", "12 tonn", "16 tonn"], correct: 2, explanation: "En gjennomsnittsnordmann slipper ut omtrent 12 tonn CO2 per år."},
+            {question: "Hvilket materiale er best for miljøet som handlepose?", answers: ["Plast", "Papir", "Bomull", "Gjenbrukbar pose"], correct: 3, explanation: "Gjenbrukbare poser er best for miljøet når de brukes mange ganger."},
+            {question: "Hvor mye av verdens elektrisitet kommer fra fornybare kilder?", answers: ["15%", "25%", "35%", "45%"], correct: 1, explanation: "Omtrent 25% av verdens elektrisitet kommer fra fornybare energikilder."},
+            {question: "Hva er den største trusselen mot biologisk mangfold?", answers: ["Klimaendringer", "Forurensning", "Habitatødeleggelse", "Invasive arter"], correct: 2, explanation: "Habitatødeleggelse er den største trusselen mot biologisk mangfold globalt."},
+            {question: "Hvor mye av verdens mat kastes hvert år?", answers: ["15%", "25%", "33%", "40%"], correct: 2, explanation: "Omtrent en tredjedel av all mat som produseres kastes hvert år."},
+            {question: "Hvilken sektor bruker mest vann globalt?", answers: ["Husholdninger", "Industri", "Landbruk", "Energiproduksjon"], correct: 2, explanation: "Landbruk bruker omtrent 70% av verdens ferskvann."},
+            {question: "Hvor mye av jordens overflate er dekket av skog?", answers: ["20%", "31%", "45%", "52%"], correct: 1, explanation: "Omtrent 31% av jordens landområder er dekket av skog."},
+            {question: "Hvilket land har størst CO2-utslipp per innbygger?", answers: ["USA", "Kina", "Qatar", "Australia"], correct: 2, explanation: "Qatar har høyest CO2-utslipp per innbygger, hovedsakelig fra olje- og gassindustrien."},
+            {question: "Hvor lang tid tar det for en aluminiumsboks å brytes ned?", answers: ["50 år", "100 år", "200 år", "500 år"], correct: 3, explanation: "En aluminiumsboks kan ta 200-500 år å brytes ned naturlig."},
+            {question: "Hva er hovedårsaken til avskoging i Amazonas?", answers: ["Tømmer", "Storfe-ranching", "Soyadyrking", "Byutvikling"], correct: 1, explanation: "Storfe-ranching er den største driveren for avskoging i Amazonas."},
+            {question: "Hvor mye energi sparer en LED-pære sammenlignet med en glødelampe?", answers: ["50%", "70%", "80%", "90%"], correct: 3, explanation: "LED-pærer bruker omtrent 90% mindre energi enn tradisjonelle glødelamper."},
+            {question: "Hvilket materiale kan resirkuleres uendelig mange ganger?", answers: ["Papir", "Plast", "Glass", "Tekstiler"], correct: 2, explanation: "Glass kan resirkuleres uendelig mange ganger uten kvalitetstap."},
+            {question: "Hvor mange grader har global temperatur økt siden førindustriell tid?", answers: ["0.5°C", "1.1°C", "2.0°C", "3.2°C"], correct: 1, explanation: "Global temperatur har økt med omtrent 1.1°C siden førindustriell tid."},
+            {question: "Hvilket transportmiddel produserer mest CO2 per kilometer per person?", answers: ["Fly", "Bil", "Buss", "Tog"], correct: 0, explanation: "Fly produserer mest CO2 per kilometer per person, spesielt på korte distanser."},
+            {question: "Hvor mye av verdens oksygen produseres av havet?", answers: ["30%", "50%", "70%", "90%"], correct: 2, explanation: "Havet produserer omtrent 70% av verdens oksygen gjennom planteplankton."},
+            {question: "Hva er den mest miljøvennlige måten å varme opp hjemmet på?", answers: ["Olje", "Gass", "Varmepumpe", "Ved"], correct: 2, explanation: "Varmepumper er mest energieffektive og miljøvennlige for oppvarming."},
+            {question: "Hvor mange plastflasker kastes hvert minutt på verdensbasis?", answers: ["50,000", "500,000", "1 million", "2 millioner"], correct: 2, explanation: "Over 1 million plastflasker kastes hvert minutt på verdensbasis."},
+            {question: "Hvilket land har verdens største regnskog?", answers: ["Brasil", "Indonesia", "Kongo", "Peru"], correct: 0, explanation: "Brasil har verdens største regnskog med Amazonas-regnskogen."},
+            {question: "Hvor mye CO2 kan ett tre absorbere i løpet av sin levetid?", answers: ["100 kg", "500 kg", "1 tonn", "2 tonn"], correct: 2, explanation: "Et gjennomsnittlig tre kan absorbere omtrent 1 tonn CO2 i løpet av sin levetid."},
+            {question: "Hva bruker mest energi i et typisk hjem?", answers: ["Oppvarming", "Varmtvann", "Belysning", "Elektronikk"], correct: 0, explanation: "Oppvarming står for omtrent 60-70% av energibruken i norske hjem."},
+            {question: "Hvor mange dyrearter dør ut hver dag på grunn av menneskelig aktivitet?", answers: ["10", "50", "150", "300"], correct: 2, explanation: "Forskere anslår at 100-150 arter dør ut hver dag på grunn av menneskelig påvirkning."},
+            {question: "Hvilket fiskeri er mest bærekraftig?", answers: ["Trålfiske", "Snurrevad", "Krokfiske", "Kastenot"], correct: 2, explanation: "Krokfiske er mest selektivt og skåner havbunnen og andre arter."},
+            {question: "Hvor mye av Norges strøm kommer fra fornybare kilder?", answers: ["85%", "95%", "98%", "100%"], correct: 2, explanation: "Omtrent 98% av Norges strømproduksjon kommer fra fornybare kilder."},
+            {question: "Hva skjer med elektronikk-avfall i Norge?", answers: ["Kastes", "Eksporteres", "Resirkuleres", "Brennes"], correct: 2, explanation: "Norge har god ordning for innsamling og resirkulering av elektronikk-avfall."},
+            {question: "Hvilken måte å tørke klær på er mest miljøvennlig?", answers: ["Tørketrommel", "Lufttørking", "Varmevifte", "Radiator"], correct: 1, explanation: "Lufttørking bruker ingen energi og er derfor mest miljøvennlig."},
+            {question: "Hvor mange prosent av verdens korn brukes til dyrefôr?", answers: ["20%", "35%", "50%", "65%"], correct: 2, explanation: "Omtrent 50% av verdens kornproduksjon brukes til dyrefôr."},
+            {question: "Hva er den største kilden til mikroplast i havet?", answers: ["Plastposer", "Billdekk", "Kosmetikk", "Tekstiler"], correct: 3, explanation: "Syntetiske tekstiler slipper mikroplast ved vask og er en hovedkilde til forurensning."}
+        ];
+        
+        this.audioContext = null;
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.drawBoard();
+        this.showMessage("Velg en motspiller for å starte spillet!");
+    }
+
+    setupEventListeners() {
+        document.querySelectorAll('.opponent-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.selectOpponent(e.target.closest('.opponent-btn').dataset.opponent));
+        });
+        document.getElementById('rollDice').addEventListener('click', () => this.rollDice());
+    }
+
+    selectOpponent(opponent) {
+        this.selectedOpponent = opponent;
+        document.querySelectorAll('.opponent-btn').forEach(btn => btn.classList.remove('selected'));
+        document.querySelector(`[data-opponent="${opponent}"]`).classList.add('selected');
+        
+        const names = { 'emma': 'Øko-Emma', 'geir': 'Grønne-Geir', 'simen': 'Slappe-Simen' };
+        document.getElementById('aiName').textContent = names[opponent];
+        
+        setTimeout(() => {
+            document.getElementById('opponentSelection').classList.add('hidden');
+            this.gameStarted = true;
+            this.showMessage("Spillet starter! Du begynner.");
+            this.updateDisplay();
+        }, 1000);
+    }
+
+    rollDice() {
+        if (!this.gameStarted || this.currentPlayer !== 'human') return;
+        
+        // Skjul startmeldingen når spilleren kaster første gang
+        this.hideMessage();
+        
+        const roll = Math.floor(Math.random() * 6) + 1;
+        document.getElementById('playerDiceResult').textContent = `🎲 ${roll}`;
+        this.movePlayer('human', roll);
+    }
+
+    movePlayer(player, steps) {
+        const isHuman = player === 'human';
+        const currentPos = isHuman ? this.playerPosition : this.aiPosition;
+        
+        // Vent litt før vi begynner å flytte (som i ekte brettspill)
+        setTimeout(() => {
+            this.animateStepByStep(player, currentPos, steps, () => {
+                this.checkSpecialSquares(player, steps);
+            });
+        }, 800); // 800ms pause etter terningkast
+    }
+
+    animateStepByStep(player, startPos, steps, callback) {
+        const isHuman = player === 'human';
+        let currentStep = 0;
+        let currentPosition = startPos;
+        
+        const moveOneStep = () => {
+            if (currentStep >= steps) {
+                // Ferdig med alle steg
+                callback();
+                return;
+            }
+            
+            currentStep++;
+            const newPosition = Math.min(currentPosition + 1, 100);
+            
+            // Oppdater spillerens posisjon
+            if (isHuman) {
+                this.playerPosition = newPosition;
+            } else {
+                this.aiPosition = newPosition;
+            }
+            
+            // Tegn spillerne på ny posisjon
+            this.drawPlayers();
+            
+            // Spill en liten "steg-lyd"
+            this.playStepSound();
+            
+            currentPosition = newPosition;
+            
+            // Hvis vi har nådd maks (100), stopp her
+            if (newPosition >= 100) {
+                callback();
+                return;
+            }
+            
+            // Vent litt før neste steg
+            setTimeout(moveOneStep, 400); // 400ms mellom hvert steg
+        };
+        
+        moveOneStep();
+    }
+
+    animatePlayerMove(player, fromPos, toPos, callback) {
+        this.updateDisplay();
+        setTimeout(() => callback(), 500);
+    }
+
+    checkSpecialSquares(player, steps) {
+        const position = player === 'human' ? this.playerPosition : this.aiPosition;
+        
+        const ladder = this.ladders.find(l => l.from === position);
+        if (ladder) {
+            this.playLadderSound();
+            this.showMessage(`${player === 'human' ? 'Du' : this.getOpponentName()} fant en stige! 🪜`);
+            setTimeout(() => {
+                if (player === 'human') { this.playerPosition = ladder.to; } 
+                else { this.aiPosition = ladder.to; }
+                this.updateDisplay();
+                this.hideMessage();
+                this.checkForNextAction(player, steps);
+            }, 1500);
+            return;
+        }
+        
+        const snake = this.snakes.find(s => s.from === position);
+        if (snake) {
+            this.playSnakeSound();
+            this.showMessage(`${player === 'human' ? 'Du' : this.getOpponentName()} ble bitt av en slange! 🐍`);
+            setTimeout(() => {
+                if (player === 'human') { this.playerPosition = snake.to; } 
+                else { this.aiPosition = snake.to; }
+                this.updateDisplay();
+                this.hideMessage();
+                this.checkForNextAction(player, steps);
+            }, 1500);
+            return;
+        }
+        
+        this.checkForNextAction(player, steps);
+    }
+
+    checkForNextAction(player, steps) {
+        const position = player === 'human' ? this.playerPosition : this.aiPosition;
+        
+        if (position >= 100) {
+            this.endGame(player);
+            return;
+        }
+        
+        const questionSquares = [2, 3, 5, 7, 11, 13, 17, 20, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 69, 71, 73, 79, 83, 89, 97, 15, 27, 35, 50, 65, 77, 85, 90];
+        
+        if (questionSquares.includes(position)) {
+            this.askQuestion(player, steps);
+        } else {
+            this.switchTurn();
+        }
+    }
+
+    askQuestion(player, steps) {
+        if (this.usedQuestions.size >= this.questions.length) {
+            this.usedQuestions.clear();
+        }
+        
+        let question;
+        do {
+            question = this.questions[Math.floor(Math.random() * this.questions.length)];
+        } while (this.usedQuestions.has(question.question));
+        
+        this.usedQuestions.add(question.question);
+        
+        if (player === 'human') {
+            this.showQuestionModal(question, () => this.switchTurn());
+        } else {
+            this.handleAIQuestion(question, () => this.switchTurn());
+        }
+    }
+
+    showQuestionModal(question, callback) {
+        // Spill spørsmålslyd
+        this.playQuestionSound();
+        
+        const questionText = document.getElementById('questionText');
+        questionText.textContent = question.question;
+        // Tilbakestill styling for spørsmål
+        questionText.style.fontSize = '';
+        questionText.style.fontWeight = '';
+        questionText.style.fontStyle = '';
+        questionText.style.color = '';
+        
+        const buttonsContainer = document.getElementById('answerButtons');
+        buttonsContainer.innerHTML = '';
+        
+        // Legg til header som viser at det er spilleren som svarer
+        const playerHeader = document.createElement('div');
+        playerHeader.style.cssText = 'background: #C8E6C9; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; color: #2E7D32;';
+        playerHeader.textContent = '🎯 Din tur å svare:';
+        buttonsContainer.appendChild(playerHeader);
+        
+        question.answers.forEach((answer, index) => {
+            const button = document.createElement('button');
+            button.className = 'answer-button';
+            button.textContent = answer;
+            button.onclick = () => this.handleAnswer(index, question.correct, question.explanation, callback, playerHeader);
+            buttonsContainer.appendChild(button);
+        });
+        
+        document.getElementById('questionModal').classList.remove('hidden');
+    }
+
+    handleAnswer(selectedIndex, correctIndex, explanation, callback, playerHeader) {
+        const buttons = document.querySelectorAll('.answer-button');
+        const isCorrect = selectedIndex === correctIndex;
+        
+        // Marker spillerens valg
+        buttons[selectedIndex].style.cssText += 'background: #2196F3; color: white; font-weight: bold; transform: scale(1.05);';
+        
+        // Spill riktig/feil lyd
+        if (isCorrect) {
+            this.playCorrectSound();
+        } else {
+            this.playIncorrectSound();
+        }
+        
+        // Vent litt, så vis riktig svar
+        setTimeout(() => {
+            buttons[correctIndex].classList.add('correct');
+            
+            if (!isCorrect) {
+                buttons[selectedIndex].classList.add('incorrect');
+            }
+            
+            // Oppdater header med resultat
+            playerHeader.textContent = isCorrect ? 
+                '🎯 Du svarte riktig! Du får kaste en gang til!' : 
+                '❌ Du svarte feil.';
+            playerHeader.style.background = isCorrect ? '#C8E6C9' : '#FFCDD2';
+            playerHeader.style.color = isCorrect ? '#2E7D32' : '#C62828';
+            
+            setTimeout(() => {
+                // Bytt ut spørsmålsteksten med forklaringen
+                const questionText = document.getElementById('questionText');
+                questionText.textContent = explanation;
+                questionText.style.fontSize = '1.1em';
+                questionText.style.fontWeight = 'normal';
+                questionText.style.fontStyle = 'italic';
+                questionText.style.color = '#666';
+                
+                setTimeout(() => {
+                    document.getElementById('questionModal').classList.add('hidden');
+                    
+                    if (isCorrect) {
+                        // Spilleren får kaste igjen - ikke bytt tur
+                        this.showMessage("Din tur igjen! Kast terning.");
+                    } else {
+                        // Feil svar - bytt tur
+                        callback();
+                    }
+                }, 5000); // Økt fra 3000ms til 5000ms
+            }, 2000);
+        }, 1000);
+    }
+
+    handleAIQuestion(question, callback) {
+        const accuracy = this.getOpponentAccuracy();
+        const isCorrect = Math.random() < accuracy;
+        
+        // Spill spørsmålslyd
+        this.playQuestionSound();
+        
+        this.showAIQuestionModal(question, isCorrect, callback);
+    }
+
+    showAIQuestionModal(question, isCorrect, callback) {
+        // Vis spørsmålet først
+        const questionText = document.getElementById('questionText');
+        questionText.textContent = question.question;
+        // Tilbakestill styling for spørsmål
+        questionText.style.fontSize = '';
+        questionText.style.fontWeight = '';
+        questionText.style.fontStyle = '';
+        questionText.style.color = '';
+        
+        const buttonsContainer = document.getElementById('answerButtons');
+        buttonsContainer.innerHTML = '';
+        
+        // Legg til header som viser at det er AI som svarer
+        const aiHeader = document.createElement('div');
+        aiHeader.style.cssText = 'background: #FFE082; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; color: #F57C00;';
+        aiHeader.textContent = `${this.getOpponentName()} tenker...`;
+        buttonsContainer.appendChild(aiHeader);
+        
+        // Vis alle svaralternativene (men ikke klikkbare)
+        question.answers.forEach((answer, index) => {
+            const button = document.createElement('div');
+            button.className = 'answer-button';
+            button.style.cursor = 'default';
+            button.style.opacity = '0.7';
+            button.textContent = answer;
+            buttonsContainer.appendChild(button);
+        });
+        
+        document.getElementById('questionModal').classList.remove('hidden');
+        
+        // Etter 3 sekunder, vis AI-svaret
+        setTimeout(() => {
+            const aiAnswer = isCorrect ? question.correct : Math.floor(Math.random() * question.answers.length);
+            
+            // Oppdater header
+            aiHeader.textContent = `${this.getOpponentName()} svarer:`;
+            
+            // Marker AI-svaret
+            const buttons = buttonsContainer.querySelectorAll('.answer-button');
+            buttons[aiAnswer].style.cssText += 'background: #2196F3; color: white; font-weight: bold; transform: scale(1.05);';
+            
+            // Spill riktig/feil lyd
+            if (isCorrect) {
+                this.playCorrectSound();
+            } else {
+                this.playIncorrectSound();
+            }
+            
+            // Etter 2 sekunder, vis riktig svar og forklaring
+            setTimeout(() => {
+                buttons[question.correct].classList.add('correct');
+                if (!isCorrect) {
+                    buttons[aiAnswer].classList.add('incorrect');
+                }
+                
+                // Oppdater header med resultat
+                aiHeader.textContent = isCorrect ? 
+                    `${this.getOpponentName()} svarte riktig! 🎯` : 
+                    `${this.getOpponentName()} svarte feil.`;
+                aiHeader.style.background = isCorrect ? '#C8E6C9' : '#FFCDD2';
+                aiHeader.style.color = isCorrect ? '#2E7D32' : '#C62828';
+                
+                setTimeout(() => {
+                    // Bytt ut spørsmålsteksten med forklaringen
+                    const questionText = document.getElementById('questionText');
+                    questionText.textContent = question.explanation;
+                    questionText.style.fontSize = '1.1em';
+                    questionText.style.fontWeight = 'normal';
+                    questionText.style.fontStyle = 'italic';
+                    questionText.style.color = '#666';
+                    
+                    setTimeout(() => {
+                        document.getElementById('questionModal').classList.add('hidden');
+                        
+                        if (isCorrect) {
+                            // AI får kaste igjen
+                            setTimeout(() => this.handleAITurn(), 1000);
+                        } else {
+                            // AI svarte feil - bytt tur
+                            callback();
+                        }
+                    }, 5000); // Økt fra 3000ms til 5000ms
+                }, 2000);
+            }, 2000);
+        }, 3000);
+    }
+
+    getOpponentAccuracy() {
+        const accuracies = { 'emma': 0.85, 'geir': 0.60, 'simen': 0.25 };
+        return accuracies[this.selectedOpponent] || 0.5;
+    }
+
+    getOpponentName() {
+        const names = { 'emma': 'Øko-Emma', 'geir': 'Grønne-Geir', 'simen': 'Slappe-Simen' };
+        return names[this.selectedOpponent] || 'Motspiller';
+    }
+
+    switchTurn() {
+        this.currentPlayer = this.currentPlayer === 'human' ? 'ai' : 'human';
+        this.updateDisplay();
+        
+        if (this.currentPlayer === 'ai') {
+            setTimeout(() => this.handleAITurn(), 1500);
+        }
+    }
+
+    handleAITurn() {
+        if (this.currentPlayer !== 'ai') return;
+        
+        const roll = Math.floor(Math.random() * 6) + 1;
+        document.getElementById('aiDiceResult').textContent = `🎲 ${roll}`;
+        document.getElementById('aiStatus').textContent = `${this.getOpponentName()} kastet ${roll}`;
+        
+        setTimeout(() => this.movePlayer('ai', roll), 1000);
+    }
+
+    updateDisplay() {
+        document.getElementById('playerPosition').textContent = this.playerPosition;
+        document.getElementById('aiPosition').textContent = this.aiPosition;
+        
+        const turnElement = document.getElementById('currentTurn');
+        const rollButton = document.getElementById('rollDice');
+        const aiStatus = document.getElementById('aiStatus');
+        
+        if (this.currentPlayer === 'human') {
+            turnElement.textContent = "Din tur!";
+            rollButton.disabled = false;
+            aiStatus.textContent = "Venter...";
+        } else {
+            turnElement.textContent = "Motspillerens tur";
+            rollButton.disabled = true;
+            aiStatus.textContent = `${this.getOpponentName()} tenker...`;
+        }
+        
+        this.drawPlayers();
+    }
+
+    drawBoard() {
+        this.drawChecker();
+        this.drawGrid();
+        this.drawNumbers();
+        this.drawLadders();
+        this.drawSnakes();
+        this.drawQuestionMarks();
+        this.drawPlayers();
+    }
+
+    drawChecker() {
+        const NS = 'http://www.w3.org/2000/svg';
+        const checkerGroup = document.getElementById('checker');
+        checkerGroup.innerHTML = '';
+        
+        for (let r = 0; r < 10; r++) {
+            for (let c = 0; c < 10; c++) {
+                const rect = document.createElementNS(NS, 'rect');
+                rect.setAttribute('x', c * 100);
+                rect.setAttribute('y', r * 100);
+                rect.setAttribute('width', '100');
+                rect.setAttribute('height', '100');
+                const isLight = ((r + c) % 2 === 0);
+                rect.setAttribute('fill', isLight ? '#f5f5dc' : '#d3d3d3');
+                rect.setAttribute('fill-opacity', isLight ? '0.8' : '0.6');
+                checkerGroup.appendChild(rect);
+            }
+        }
+    }
+
+    drawGrid() {
+        const gridGroup = document.getElementById('grid');
+        gridGroup.innerHTML = '';
+        
+        for (let i = 0; i <= 10; i++) {
+            const vLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            vLine.setAttribute('x1', i * 100);
+            vLine.setAttribute('y1', 0);
+            vLine.setAttribute('x2', i * 100);
+            vLine.setAttribute('y2', 1000);
+            gridGroup.appendChild(vLine);
+            
+            const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            hLine.setAttribute('x1', 0);
+            hLine.setAttribute('y1', i * 100);
+            hLine.setAttribute('x2', 1000);
+            hLine.setAttribute('y2', i * 100);
+            gridGroup.appendChild(hLine);
+        }
+    }
+
+    drawNumbers() {
+        const numbersGroup = document.getElementById('numbers');
+        numbersGroup.innerHTML = '';
+        
+        for (let i = 1; i <= 100; i++) {
+            const coords = this.getSquareCoordinates(i);
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', coords.x - 40);
+            text.setAttribute('y', coords.y - 30);
+            text.textContent = i;
+            text.setAttribute('font-size', '16');
+            text.setAttribute('fill', '#333');
+            numbersGroup.appendChild(text);
+        }
+        
+        // START and GOAL labels
+        const startCoords = this.getSquareCoordinates(1);
+        const startText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        startText.setAttribute('x', startCoords.x);
+        startText.setAttribute('y', startCoords.y + 25);
+        startText.setAttribute('text-anchor', 'middle');
+        startText.setAttribute('font-size', '20');
+        startText.setAttribute('font-weight', 'bold');
+        startText.setAttribute('fill', '#FF0000');
+        startText.textContent = 'START';
+        numbersGroup.appendChild(startText);
+        
+        const goalCoords = this.getSquareCoordinates(100);
+        const goalText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        goalText.setAttribute('x', goalCoords.x);
+        goalText.setAttribute('y', goalCoords.y + 25);
+        goalText.setAttribute('text-anchor', 'middle');
+        goalText.setAttribute('font-size', '20');
+        goalText.setAttribute('font-weight', 'bold');
+        goalText.setAttribute('fill', '#FF0000');
+        goalText.textContent = 'MÅL';
+        numbersGroup.appendChild(goalText);
+    }
+
+    ensureGradients() {
+        const NS = 'http://www.w3.org/2000/svg';
+        const svg = document.getElementById('gameBoard');
+        let defs = svg.querySelector('defs');
+        if (!defs) {
+            defs = document.createElementNS(NS, 'defs');
+            svg.insertBefore(defs, svg.firstChild);
+        }
+        if (!document.getElementById('bambooGrad')) {
+            const lg = document.createElementNS(NS, 'linearGradient');
+            lg.id = 'bambooGrad';
+            lg.setAttribute('x1', '0');
+            lg.setAttribute('y1', '0');
+            lg.setAttribute('x2', '0');
+            lg.setAttribute('y2', '1');
+            const s1 = document.createElementNS(NS, 'stop');
+            s1.setAttribute('offset', '0%');
+            s1.setAttribute('stop-color', '#a88452');
+            const s2 = document.createElementNS(NS, 'stop');
+            s2.setAttribute('offset', '100%');
+            s2.setAttribute('stop-color', '#8d6e4a');
+            lg.appendChild(s1);
+            lg.appendChild(s2);
+            defs.appendChild(lg);
+        }
+    }
+
+    drawLadders() {
+        this.ensureGradients();
+        const NS = 'http://www.w3.org/2000/svg';
+        const laddersGroup = document.getElementById('ladders');
+        laddersGroup.innerHTML = '';
+        
+        this.ladders.forEach(ladder => {
+            const fromCoords = this.getSquareCoordinates(ladder.from);
+            const toCoords = this.getSquareCoordinates(ladder.to);
+            
+            const dx = toCoords.x - fromCoords.x;
+            const dy = toCoords.y - fromCoords.y;
+            const len = Math.sqrt(dx * dx + dy * dy) || 1;
+            const ux = dx / len;
+            const uy = dy / len;
+            const px = -uy;
+            const py = ux;
+            const ladderHalf = 18;
+            
+            // Rails
+            ['left', 'right'].forEach((side, index) => {
+                const sign = side === 'left' ? 1 : -1;
+                const rail = document.createElementNS(NS, 'line');
+                rail.setAttribute('x1', fromCoords.x + px * ladderHalf * sign);
+                rail.setAttribute('y1', fromCoords.y + py * ladderHalf * sign);
+                rail.setAttribute('x2', toCoords.x + px * ladderHalf * sign);
+                rail.setAttribute('y2', toCoords.y + py * ladderHalf * sign);
+                rail.setAttribute('stroke', 'url(#bambooGrad)');
+                rail.setAttribute('stroke-width', '14');
+                rail.setAttribute('stroke-linecap', 'round');
+                laddersGroup.appendChild(rail);
+            });
+            
+            // Rungs
+            for (let i = 1; i < 7; i++) {
+                const t = i / 7;
+                const cx = fromCoords.x + dx * t;
+                const cy = fromCoords.y + dy * t;
+                const rung = document.createElementNS(NS, 'line');
+                rung.setAttribute('x1', cx + px * 16);
+                rung.setAttribute('y1', cy + py * 16);
+                rung.setAttribute('x2', cx - px * 16);
+                rung.setAttribute('y2', cy - py * 16);
+                rung.setAttribute('stroke', '#b79259');
+                rung.setAttribute('stroke-width', '8');
+                rung.setAttribute('stroke-linecap', 'round');
+                laddersGroup.appendChild(rung);
+            }
+        });
+    }
+
+    drawSnakes() {
+        const NS = 'http://www.w3.org/2000/svg';
+        const snakesGroup = document.getElementById('snakes');
+        snakesGroup.innerHTML = '';
+        
+        const snakeColors = ['#2f5d31', '#a34710', '#c2a500', '#5a6a4d', '#1a1a1a', '#2c6e49'];
+        
+        this.snakes.forEach((snake, s) => {
+            const headCoords = this.getSquareCoordinates(snake.from);
+            const tailCoords = this.getSquareCoordinates(snake.to);
+            
+            const dx = tailCoords.x - headCoords.x;
+            const dy = tailCoords.y - headCoords.y;
+            const len = Math.sqrt(dx * dx + dy * dy) || 1;
+            const ux = dx / len;
+            const uy = dy / len;
+            const px = -uy;
+            const py = ux;
+            const amp = 40 + (s % 3) * 10;
+            
+            const p0 = headCoords;
+            const p1 = { x: headCoords.x + ux * (len * 0.33) + px * (+amp), y: headCoords.y + uy * (len * 0.33) + py * (+amp) };
+            const p2 = { x: headCoords.x + ux * (len * 0.66) + px * (-amp), y: headCoords.y + uy * (len * 0.66) + py * (-amp) };
+            const p3 = tailCoords;
+            
+            const d = `M ${p0.x},${p0.y} C ${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`;
+            const bodyColor = snakeColors[s % snakeColors.length];
+            const bodyWidth = 22 - (s % 3) * 3;
+            
+            // Body
+            const body = document.createElementNS(NS, 'path');
+            body.setAttribute('d', d);
+            body.setAttribute('fill', 'none');
+            body.setAttribute('stroke', bodyColor);
+            body.setAttribute('stroke-width', bodyWidth);
+            body.setAttribute('stroke-linecap', 'round');
+            body.setAttribute('opacity', '0.96');
+            snakesGroup.appendChild(body);
+            
+            // Belly
+            const belly = document.createElementNS(NS, 'path');
+            belly.setAttribute('d', d);
+            belly.setAttribute('fill', 'none');
+            belly.setAttribute('stroke', '#e7e3c9');
+            belly.setAttribute('stroke-width', Math.max(6, bodyWidth * 0.45));
+            belly.setAttribute('stroke-linecap', 'round');
+            belly.setAttribute('opacity', '0.35');
+            snakesGroup.appendChild(belly);
+            
+            // Head
+            const angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+            const head = document.createElementNS(NS, 'ellipse');
+            head.setAttribute('cx', headCoords.x);
+            head.setAttribute('cy', headCoords.y);
+            head.setAttribute('rx', 16 + (s % 3) * 2);
+            head.setAttribute('ry', 12 + (s % 3) * 2);
+            head.setAttribute('fill', bodyColor);
+            head.setAttribute('transform', `rotate(${angleDeg},${headCoords.x},${headCoords.y})`);
+            snakesGroup.appendChild(head);
+        });
+    }
+
+    drawQuestionMarks() {
+        const numbersGroup = document.getElementById('numbers');
+        const existingMarks = numbersGroup.querySelectorAll('.question-mark');
+        existingMarks.forEach(mark => mark.remove());
+        
+        const questionSquares = [2, 3, 5, 7, 11, 13, 17, 20, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 69, 71, 73, 79, 83, 89, 97, 15, 27, 35, 50, 65, 77, 85, 90];
+        
+        questionSquares.forEach(square => {
+            const coords = this.getSquareCoordinates(square);
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', coords.x);
+            text.setAttribute('y', coords.y + 15);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('font-size', '40');
+            text.setAttribute('fill', '#FF0000');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('stroke', '#FFFFFF');
+            text.setAttribute('stroke-width', '1');
+            text.textContent = '?';
+            text.setAttribute('class', 'question-mark');
+            numbersGroup.appendChild(text);
+        });
+    }
+
+    drawPlayers() {
+        console.log('Drawing players at positions:', this.playerPosition, this.aiPosition);
+        const playersGroup = document.getElementById('players');
+        if (!playersGroup) {
+            console.error('Players group not found!');
+            return;
+        }
+        
+        const existingPlayers = playersGroup.querySelectorAll('.player-piece');
+        existingPlayers.forEach(player => player.remove());
+        
+        // Human player
+        const humanCoords = this.getSquareCoordinates(this.playerPosition);
+        console.log('Human coords:', humanCoords);
+        const humanPlayer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        humanPlayer.setAttribute('id', 'player-human');
+        humanPlayer.setAttribute('cx', humanCoords.x - 15);
+        humanPlayer.setAttribute('cy', humanCoords.y + 15);
+        humanPlayer.setAttribute('r', '20');
+        humanPlayer.setAttribute('fill', '#00FF00');
+        humanPlayer.setAttribute('stroke', '#000000');
+        humanPlayer.setAttribute('stroke-width', '4');
+        humanPlayer.style.zIndex = '1000';
+        humanPlayer.setAttribute('class', 'player-piece');
+        playersGroup.appendChild(humanPlayer);
+        
+        // AI player
+        const aiCoords = this.getSquareCoordinates(this.aiPosition);
+        console.log('AI coords:', aiCoords);
+        const aiPlayer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        aiPlayer.setAttribute('id', 'player-ai');
+        aiPlayer.setAttribute('cx', aiCoords.x + 15);
+        aiPlayer.setAttribute('cy', aiCoords.y + 15);
+        aiPlayer.setAttribute('r', '20');
+        aiPlayer.setAttribute('fill', '#FF0000');
+        aiPlayer.setAttribute('stroke', '#000000');
+        aiPlayer.setAttribute('stroke-width', '4');
+        aiPlayer.style.zIndex = '1000';
+        aiPlayer.setAttribute('class', 'player-piece');
+        playersGroup.appendChild(aiPlayer);
+        
+        console.log('Players drawn, total pieces:', playersGroup.querySelectorAll('.player-piece').length);
+    }
+
+    getSquareCoordinates(square) {
+        const row = Math.floor((square - 1) / 10);
+        const col = (square - 1) % 10;
+        const actualCol = row % 2 === 0 ? col : 9 - col;
+        const actualRow = 9 - row;
+        
+        return {
+            x: actualCol * 100 + 50,
+            y: actualRow * 100 + 50
+        };
+    }
+
+    showMessage(message) {
+        const messageEl = document.getElementById('gameMessage');
+        messageEl.textContent = message;
+        messageEl.classList.remove('hidden');
+    }
+
+    hideMessage() {
+        document.getElementById('gameMessage').classList.add('hidden');
+    }
+
+    endGame(winner) {
+        this.playVictorySound();
+        
+        if (winner === 'human') {
+            this.showMessage("🎉 Gratulerer! Du vant spillet! 🎉");
+        } else {
+            this.showMessage(`${this.getOpponentName()} vant denne gangen! Prøv igjen!`);
+        }
+        
+        document.getElementById('rollDice').disabled = true;
+        
+        setTimeout(() => {
+            if (confirm('Spillet er ferdig! Vil du spille igjen?')) {
+                location.reload();
+            }
+        }, 3000);
+    }
+
+    playLadderSound() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        const frequencies = [262, 330, 392, 523];
+        frequencies.forEach((freq, i) => {
+            setTimeout(() => {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.3);
+            }, i * 100);
+        });
+    }
+
+    playSnakeSound() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 1);
+        oscillator.type = 'sawtooth';
+        
+        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 1);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 1);
+    }
+
+    playStepSound() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.05, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.1);
+    }
+
+    playQuestionSound() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // "Ding" lyd for spørsmål
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.3);
+    }
+
+    playCorrectSound() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Positiv "ding-ding" lyd
+        [600, 800].forEach((freq, i) => {
+            setTimeout(() => {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.2);
+            }, i * 150);
+        });
+    }
+
+    playIncorrectSound() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Trist "wah-wah" lyd
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(400, this.audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.5);
+        oscillator.type = 'sawtooth';
+        
+        gainNode.gain.setValueAtTime(0.06, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.5);
+    }
+
+    playVictorySound() {
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        const melody = [523, 659, 784, 1047];
+        melody.forEach((freq, i) => {
+            setTimeout(() => {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.5);
+            }, i * 200);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new MiljoQuizGame();
+});
+    </script>
+</body>
+</html>
