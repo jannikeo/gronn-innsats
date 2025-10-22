@@ -70,11 +70,46 @@ const LEVEL_1_ITEMS = [
     fact: "Gammelt brød går i matavfall"
   },
   {
+    name: "Eggeskall",
+    emoji: "🥚",
+    category: "matavfall",
+    difficulty: 1,
+    fact: "Eggeskall er rik på kalsium og passer perfekt i kompost"
+  },
+  {
+    name: "Appelsinskall",
+    emoji: "🍊",
+    category: "matavfall",
+    difficulty: 1,
+    fact: "Sitrusskall brytes ned og blir til næringsrik jord"
+  },
+  {
+    name: "Tepose",
+    emoji: "🍵",
+    category: "matavfall",
+    difficulty: 1,
+    fact: "Brukte teposer og te går i matavfall"
+  },
+  {
+    name: "Kyllingbein",
+    emoji: "🍗",
+    category: "matavfall",
+    difficulty: 1,
+    fact: "Kjøttbein og matrester går i matavfall"
+  },
+  {
     name: "Pappeske",
     emoji: "📦",
     category: "papir",
     difficulty: 1,
     fact: "Papp kan resirkuleres minst 7 ganger"
+  },
+  {
+    name: "Konvolutt",
+    emoji: "📮",
+    category: "papir",
+    difficulty: 1,
+    fact: "Konvolutter og brev kan resirkuleres som papir"
   },
   {
     name: "Avis",
@@ -112,6 +147,13 @@ const LEVEL_1_ITEMS = [
     fact: "Skyll plasten før du kaster den"
   },
   {
+    name: "Plastkopp",
+    emoji: "🥤",
+    category: "plast",
+    difficulty: 1,
+    fact: "Engangskrus av plast kan resirkuleres"
+  },
+  {
     name: "Bleie",
     emoji: "🩲",
     category: "restavfall",
@@ -131,6 +173,34 @@ const LEVEL_1_ITEMS = [
     category: "restavfall",
     difficulty: 1,
     fact: "Blandingsmaterialer går i restavfall"
+  },
+  {
+    name: "Sigarettstump",
+    emoji: "🚬",
+    category: "restavfall",
+    difficulty: 1,
+    fact: "Sigarettstumper inneholder giftstoffer og skal i restavfall"
+  },
+  {
+    name: "Snuspose",
+    emoji: "🟤",
+    category: "restavfall",
+    difficulty: 1,
+    fact: "Snusposer går i restavfall, ikke matavfall"
+  },
+  {
+    name: "Støvsugerpose",
+    emoji: "💼",
+    category: "restavfall",
+    difficulty: 1,
+    fact: "Støvsugerposer med innhold går i restavfall"
+  },
+  {
+    name: "Plaster",
+    emoji: "🩹",
+    category: "restavfall",
+    difficulty: 1,
+    fact: "Brukte plaster er hygieneavfall og går i restavfall"
   }
 ];
 
