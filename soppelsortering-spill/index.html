@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Søppelsortering - Lær å sortere riktig!</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <h1>🗑️ Søppelsortering</h1>
+            <div class="game-info">
+                <div class="level-display">Nivå: <span id="current-level">1</span></div>
+                <div class="score-display">Poeng: <span id="score">0</span></div>
+            </div>
+        </header>
+
+        <!-- Start skjerm -->
+        <div id="start-screen" class="screen active">
+            <div class="start-content">
+                <h2>Velkommen til Sorteringsanlegget! 🏭</h2>
+                <p>Hjelp oss å sortere søppelet riktig!</p>
+                <div class="level-info">
+                    <h3>Nivå 1: Grunnleggende</h3>
+                    <p>Lær de fire viktigste kategoriene</p>
+                    <div class="categories-preview">
+                        <div class="category-badge" style="background: #4CAF50;">🥕 Matavfall</div>
+                        <div class="category-badge" style="background: #2196F3;">📦 Papir</div>
+                        <div class="category-badge" style="background: #FF9800;">🧴 Plast</div>
+                        <div class="category-badge" style="background: #757575;">🗑️ Restavfall</div>
+                    </div>
+                </div>
+                <button id="start-button" class="btn btn-large">Start spillet</button>
+                <div class="instructions">
+                    <h4>Slik spiller du:</h4>
+                    <ul>
+                        <li>Dra søppelgjenstander fra samlebåndet til riktig container</li>
+                        <li>+10 poeng for riktig sortering, -5 poeng for feil!</li>
+                        <li>Feil sortering sender gjenstanden tilbake</li>
+                        <li>Pass på at båndet ikke blir fullt!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spillskjerm -->
+        <div id="game-screen" class="screen">
+            <!-- Samlebånd -->
+            <div class="conveyor-belt-container">
+                <div class="conveyor-belt" id="conveyor-belt">
+                    <!-- Søppelgjenstander vil bli lagt til her dynamisk -->
+                </div>
+                <div class="belt-capacity">
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" id="capacity-fill"></div>
+                    </div>
+                    <span id="capacity-text">0/10</span>
+                </div>
+            </div>
+
+            <!-- Containere -->
+            <div class="containers-area" id="containers-area">
+                <!-- Containere vil bli generert dynamisk basert på nivå -->
+            </div>
+
+            <!-- Pause knapp -->
+            <button id="pause-button" class="btn btn-small">⏸️ Pause</button>
+        </div>
+
+        <!-- Quiz skjerm (flervalg) -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-content">
+                <h2>🤔 Bonusutfordring!</h2>
+                <div id="quiz-question" class="quiz-question"></div>
+                <div id="quiz-options" class="quiz-options">
+                    <!-- Alternativer genereres dynamisk -->
+                </div>
+                <div id="quiz-feedback" class="quiz-feedback hidden"></div>
+            </div>
+        </div>
+
+        <!-- Finn feilen skjerm -->
+        <div id="find-error-screen" class="screen">
+            <div class="find-error-content">
+                <h2>🔍 Finn feilen!</h2>
+                <div id="error-task-title" class="task-title"></div>
+                <div id="error-task-description" class="task-description"></div>
+                <div id="error-items" class="error-items">
+                    <!-- Gjenstander genereres dynamisk -->
+                </div>
+                <div id="error-feedback" class="error-feedback hidden"></div>
+                <button id="check-errors-button" class="btn">Sjekk svarene mine</button>
+            </div>
+        </div>
+
+        <!-- Level intro skjerm -->
+        <div id="level-intro-screen" class="screen">
+            <div class="level-intro-content">
+                <h2 id="level-intro-title">Nivå 2</h2>
+                <p id="level-intro-subtitle">Middels vanskelig</p>
+                <div id="level-intro-info" class="level-info">
+                    <!-- Info genereres dynamisk -->
+                </div>
+                <div id="level-intro-categories" class="categories-preview">
+                    <!-- Kategorier genereres dynamisk -->
+                </div>
+                <button id="start-level-button" class="btn btn-large">Start nivå</button>
+            </div>
+        </div>
+
+        <!-- Level complete skjerm -->
+        <div id="level-complete-screen" class="screen">
+            <div class="level-complete-content">
+                <h2>🎉 Gratulerer!</h2>
+                <p id="level-complete-message">Du fullførte nivået!</p>
+                <div id="level-stats" class="level-stats">
+                    <!-- Statistikk genereres dynamisk -->
+                </div>
+                <button id="next-level-button" class="btn btn-large">Neste nivå</button>
+            </div>
+        </div>
+
+        <!-- Game over skjerm -->
+        <div id="game-over-screen" class="screen">
+            <div class="game-over-content">
+                <h2>😞 Sorteringsanlegget gikk i stå!</h2>
+                <p>Båndet ble for fullt!</p>
+                <div id="final-stats" class="final-stats">
+                    <!-- Statistikk genereres dynamisk -->
+                </div>
+                <button id="restart-button" class="btn btn-large">Prøv igjen</button>
+                <button id="menu-button" class="btn">Tilbake til menyen</button>
+            </div>
+        </div>
+
+        <!-- Pause overlay -->
+        <div id="pause-overlay" class="overlay hidden">
+            <div class="pause-content">
+                <h2>⏸️ Pause</h2>
+                <button id="resume-button" class="btn btn-large">Fortsett</button>
+                <button id="quit-button" class="btn">Avslutt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lyd effekter (vil legges til senere) -->
+    <audio id="sound-correct" preload="auto"></audio>
+    <audio id="sound-wrong" preload="auto"></audio>
+    <audio id="sound-yuck" preload="auto"></audio>
+    <audio id="sound-level-complete" preload="auto"></audio>
+
+    <!-- Scripts -->
+    <script src="sorteringsdata.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
