@@ -230,7 +230,7 @@ const LEVEL_2_ITEMS = [
   },
   {
     name: "Aluminiumsfolie",
-    emoji: "📄",
+    emoji: "🧻",
     category: "glass",
     difficulty: 2,
     fact: "Aluminiumsfolie går sammen med metallemballasje"
@@ -241,6 +241,41 @@ const LEVEL_2_ITEMS = [
     category: "glass",
     difficulty: 2,
     fact: "Hermetikkbokser av metall kan resirkuleres i det uendelige!"
+  },
+  {
+    name: "Brusboks",
+    emoji: "🥤",
+    category: "glass",
+    difficulty: 2,
+    fact: "Brusbokser av aluminium resirkuleres sammen med glass og metall"
+  },
+  {
+    name: "Ølboks",
+    emoji: "🍺",
+    category: "glass",
+    difficulty: 2,
+    fact: "Metallbokser kan resirkuleres uendelig mange ganger!"
+  },
+  {
+    name: "Vinflaske",
+    emoji: "🍷",
+    category: "glass",
+    difficulty: 2,
+    fact: "Glassflasker kan smeltes ned og lages om til nye flasker"
+  },
+  {
+    name: "Syltetøyglass",
+    emoji: "🍯",
+    category: "glass",
+    difficulty: 2,
+    fact: "Skyll glasset før du kaster det i glass-containeren"
+  },
+  {
+    name: "Konservboks",
+    emoji: "🥫",
+    category: "glass",
+    difficulty: 2,
+    fact: "Bokser av metall kan resirkuleres i det uendelige!"
   },
   {
     name: "Potetskrell",
@@ -257,11 +292,46 @@ const LEVEL_2_ITEMS = [
     fact: "Brukt kaffefilter med kaffe går i matavfall"
   },
   {
+    name: "Salatblad",
+    emoji: "🥗",
+    category: "matavfall",
+    difficulty: 2,
+    fact: "Grønnsaksrester er perfekt for kompostering"
+  },
+  {
     name: "Gavepapir",
     emoji: "🎁",
     category: "papir",
     difficulty: 2,
     fact: "Vanlig gavepapir går i papir, men ikke glitrete!"
+  },
+  {
+    name: "Toalettrullkartong",
+    emoji: "🧻",
+    category: "papir",
+    difficulty: 2,
+    fact: "Pappruller fra toalettpapir kan resirkuleres"
+  },
+  {
+    name: "Smørpapir",
+    emoji: "🧈",
+    category: "papir",
+    difficulty: 2,
+    fact: "Papir med litt fett kan fortsatt resirkuleres"
+  },
+  {
+    name: "Salatboks",
+    emoji: "🥙",
+    category: "plast",
+    difficulty: 2,
+    fact: "Plastbokser fra takeaway kan resirkuleres hvis de skylles"
+  },
+  {
+    name: "Plastbestikk",
+    emoji: "🍴",
+    category: "plast",
+    difficulty: 2,
+    fact: "Engangsbestikk av plast skal i plasten"
   }
 ];
 
@@ -455,62 +525,62 @@ const VALUABLE_ITEMS = [
   {
     name: "Hundevalp",
     emoji: "🐶",
-    fact: "Heldigvis reddet du valpen! +100 poeng!",
-    points: 100
+    fact: "Heldigvis reddet du valpen! +50 poeng!",
+    points: 50
   },
   {
     name: "Diamanthalsbånd",
     emoji: "💎",
-    fact: "Et verdifullt smykke! Det hadde vært synd å kaste! +100 poeng!",
-    points: 100
+    fact: "Et verdifullt smykke! Det hadde vært synd å kaste! +50 poeng!",
+    points: 50
   },
   {
     name: "Lillebror",
     emoji: "👶",
-    fact: "Lillebror hører ikke hjemme i søpla! +100 poeng!",
-    points: 100
+    fact: "Lillebror hører ikke hjemme i søpla! +50 poeng!",
+    points: 50
   },
   {
     name: "Bestemors sølvgafler",
     emoji: "🍴",
-    fact: "Arvesølvet reddet! Bestemor blir glad! +100 poeng!",
-    points: 100
+    fact: "Arvesølvet reddet! Bestemor blir glad! +50 poeng!",
+    points: 50
   },
   {
     name: "Kattunge",
     emoji: "🐱",
-    fact: "Pytt pytt! Du reddet katten! +100 poeng!",
-    points: 100
+    fact: "Pytt pytt! Du reddet katten! +50 poeng!",
+    points: 50
   },
   {
     name: "Gullring",
     emoji: "💍",
-    fact: "En forlovelsesring! Noen blir lykkelig nå! +100 poeng!",
-    points: 100
+    fact: "En forlovelsesring! Noen blir lykkelig nå! +50 poeng!",
+    points: 50
   },
   {
     name: "Mobiltelefon",
     emoji: "📱",
-    fact: "En iPhone! Den hører ikke hjemme her! +100 poeng!",
-    points: 100
+    fact: "En iPhone! Den hører ikke hjemme her! +50 poeng!",
+    points: 50
   },
   {
     name: "Lommepenger",
     emoji: "💰",
-    fact: "Penger i søpla? Ikke lenger! +100 poeng!",
-    points: 100
+    fact: "Penger i søpla? Ikke lenger! +50 poeng!",
+    points: 50
   },
   {
     name: "Hamster",
     emoji: "🐹",
-    fact: "Den lille hamsteren er trygg! +100 poeng!",
-    points: 100
+    fact: "Den lille hamsteren er trygg! +50 poeng!",
+    points: 50
   },
   {
     name: "Nøkler",
     emoji: "🔑",
-    fact: "Husnøklene funnet! Noen slapp å bytte lås! +100 poeng!",
-    points: 100
+    fact: "Husnøklene funnet! Noen slapp å bytte lås! +50 poeng!",
+    points: 50
   }
 ];
 

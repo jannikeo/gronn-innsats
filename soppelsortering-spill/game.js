@@ -8,7 +8,7 @@ const gameState = {
     itemsMoveInterval: null,
     currentLevelItems: [],
     itemsSorted: 0,
-    itemsNeededToComplete: 20,
+    pointsNeededToComplete: 200,
     gameRunning: false,
     paused: false,
     valuableItemOnBelt: false,
@@ -22,15 +22,15 @@ const levelConfig = {
         items: LEVEL_1_ITEMS,
         categories: ['matavfall', 'papir', 'plast', 'restavfall'],
         spawnInterval: 3500, // 3.5 sekunder
-        itemsToComplete: 20,
+        pointsToComplete: 200,
         hasQuiz: false,
         hasFindError: false
     },
     2: {
         items: LEVEL_2_ITEMS,
         categories: ['matavfall', 'papir', 'plast', 'glass', 'restavfall'],
-        spawnInterval: 4000, // 4 sekunder
-        itemsToComplete: 30,
+        spawnInterval: 2700, // 2.7 sekunder (enda raskere!)
+        pointsToComplete: 300,
         hasQuiz: true,
         hasFindError: false
     },
@@ -38,7 +38,7 @@ const levelConfig = {
         items: LEVEL_3_ITEMS,
         categories: ['matavfall', 'papir', 'plast', 'glass', 'tekstil', 'farlig', 'restavfall'],
         spawnInterval: 2500, // 2.5 sekunder
-        itemsToComplete: 40,
+        pointsToComplete: 400,
         hasQuiz: true,
         hasFindError: true
     }
@@ -157,6 +157,7 @@ function startCurrentLevel() {
 
     gameState.itemsOnBelt = [];
     gameState.itemsSorted = 0;
+    gameState.score = 0; // Nullstill poeng for hvert nivå
     gameState.gameRunning = true;
     gameState.paused = false;
     gameState.valuableItemOnBelt = false;
@@ -166,7 +167,7 @@ function startCurrentLevel() {
 
     const config = levelConfig[level];
     gameState.currentLevelItems = [...config.items];
-    gameState.itemsNeededToComplete = config.itemsToComplete;
+    gameState.pointsNeededToComplete = config.pointsToComplete;
 
     // Clear the conveyor belt
     elements.conveyor.innerHTML = '';
@@ -268,11 +269,11 @@ function spawnItem() {
         return;
     }
 
-    // Randomly spawn a valuable item (20% chance for testing, will be 5% in production)
+    // Randomly spawn a valuable item (5% chance)
     let randomItem;
     let isValuable = false;
 
-    if (!gameState.valuableItemOnBelt && Math.random() < 0.20) {
+    if (!gameState.valuableItemOnBelt && Math.random() < 0.05) {
         randomItem = VALUABLE_ITEMS[Math.floor(Math.random() * VALUABLE_ITEMS.length)];
         isValuable = true;
         gameState.valuableItemOnBelt = true;
@@ -429,10 +430,10 @@ function handleWrongSort(itemElement, container) {
     setTimeout(() => container.classList.remove('wrong-drop'), 500);
 
     // Lose points
-    gameState.score -= 5;
+    gameState.score -= 10;
 
     // Show negative points feedback on container
-    showPointsFeedback('-5', container);
+    showPointsFeedback('-10', container);
 
     // Show red error message above belt
     const itemName = itemElement.dataset.name;
@@ -597,11 +598,11 @@ function updateCapacity() {
 
 function updateUI() {
     elements.currentLevel.textContent = gameState.currentLevel;
-    elements.score.textContent = gameState.score;
+    elements.score.textContent = `${gameState.score}/${gameState.pointsNeededToComplete}`;
 }
 
 function checkLevelComplete() {
-    if (gameState.itemsSorted >= gameState.itemsNeededToComplete) {
+    if (gameState.score >= gameState.pointsNeededToComplete) {
         completeLevel();
     }
 }
