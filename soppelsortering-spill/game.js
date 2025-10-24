@@ -18,7 +18,7 @@ const levelConfig = {
     1: {
         items: LEVEL_1_ITEMS,
         categories: ['matavfall', 'papir', 'plast', 'restavfall'],
-        spawnInterval: 5000, // 5 sekunder
+        spawnInterval: 3500, // 3.5 sekunder
         itemsToComplete: 20,
         hasQuiz: false,
         hasFindError: false
@@ -413,6 +413,19 @@ function updateCapacity() {
     const percentage = (gameState.itemsOnBelt.length / gameState.maxItemsOnBelt) * 100;
     elements.capacityFill.style.width = `${percentage}%`;
     elements.capacityText.textContent = `${gameState.itemsOnBelt.length}/${gameState.maxItemsOnBelt}`;
+
+    // Change color based on capacity
+    let color;
+    if (percentage < 50) {
+        color = '#4CAF50'; // Green
+    } else if (percentage < 60) {
+        color = '#FFC107'; // Yellow
+    } else if (percentage < 80) {
+        color = '#FF9800'; // Orange
+    } else {
+        color = '#f44336'; // Red
+    }
+    elements.capacityFill.style.background = color;
 }
 
 function updateUI() {
