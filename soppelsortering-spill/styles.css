@@ -183,6 +183,33 @@ body {
     z-index: 100;
 }
 
+.btn-stop {
+    padding: 15px 40px;
+    font-size: 1.3em;
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+}
+
+.btn-stop:hover {
+    transform: translateX(-50%) translateY(-3px);
+    box-shadow: 0 10px 30px rgba(244, 67, 54, 0.6);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+    }
+    50% {
+        box-shadow: 0 8px 40px rgba(244, 67, 54, 0.8);
+    }
+}
+
 /* Spillskjerm */
 #game-screen {
     position: relative;
@@ -265,6 +292,24 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
     user-select: none;
+}
+
+.waste-item.valuable {
+    background: linear-gradient(135deg, #fff8e1 0%, #ffe082 100%);
+    border: 3px solid #FFC107;
+    animation: valuable-glow 2s ease-in-out infinite;
+    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.6);
+}
+
+@keyframes valuable-glow {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(255, 193, 7, 0.6);
+        border-color: #FFC107;
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(255, 193, 7, 1);
+        border-color: #FFD54F;
+    }
 }
 
 .waste-item:hover {

@@ -450,6 +450,70 @@ const FIND_ERROR_TASKS = [
   }
 ];
 
+// Verdifulle gjenstander som ikke skal være i søppelet
+const VALUABLE_ITEMS = [
+  {
+    name: "Hundevalp",
+    emoji: "🐶",
+    fact: "Heldigvis reddet du valpen! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Diamanthalsbånd",
+    emoji: "💎",
+    fact: "Et verdifullt smykke! Det hadde vært synd å kaste! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Lillebror",
+    emoji: "👶",
+    fact: "Lillebror hører ikke hjemme i søpla! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Bestemors sølvgafler",
+    emoji: "🍴",
+    fact: "Arvesølvet reddet! Bestemor blir glad! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Kattunge",
+    emoji: "🐱",
+    fact: "Pytt pytt! Du reddet katten! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Gullring",
+    emoji: "💍",
+    fact: "En forlovelsesring! Noen blir lykkelig nå! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Mobiltelefon",
+    emoji: "📱",
+    fact: "En iPhone! Den hører ikke hjemme her! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Lommepenger",
+    emoji: "💰",
+    fact: "Penger i søpla? Ikke lenger! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Hamster",
+    emoji: "🐹",
+    fact: "Den lille hamsteren er trygg! +100 poeng!",
+    points: 100
+  },
+  {
+    name: "Nøkler",
+    emoji: "🔑",
+    fact: "Husnøklene funnet! Noen slapp å bytte lås! +100 poeng!",
+    points: 100
+  }
+];
+
 // Eksporter alt
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -458,6 +522,7 @@ if (typeof module !== 'undefined' && module.exports) {
     LEVEL_2_ITEMS,
     LEVEL_3_ITEMS,
     QUIZ_QUESTIONS,
-    FIND_ERROR_TASKS
+    FIND_ERROR_TASKS,
+    VALUABLE_ITEMS
   };
 }

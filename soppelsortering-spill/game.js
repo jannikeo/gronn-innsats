@@ -10,7 +10,10 @@ const gameState = {
     itemsSorted: 0,
     itemsNeededToComplete: 20,
     gameRunning: false,
-    paused: false
+    paused: false,
+    valuableItemOnBelt: false,
+    stopButtonActive: false,
+    beltStopped: false
 };
 
 // Level configuration
@@ -59,7 +62,8 @@ const elements = {
     capacityText: document.getElementById('capacity-text'),
     currentLevel: document.getElementById('current-level'),
     score: document.getElementById('score'),
-    pauseOverlay: document.getElementById('pause-overlay')
+    pauseOverlay: document.getElementById('pause-overlay'),
+    stopButton: document.getElementById('stop-button')
 };
 
 // Initialize game
@@ -76,6 +80,7 @@ function setupEventListeners() {
     document.getElementById('quit-button').addEventListener('click', quitGame);
     document.getElementById('restart-button').addEventListener('click', restartGame);
     document.getElementById('menu-button').addEventListener('click', () => showScreen('start'));
+    elements.stopButton.addEventListener('click', handleStopButton);
     // Note: next-level-button handler is set dynamically in showLevelComplete()
 }
 
@@ -154,6 +159,10 @@ function startCurrentLevel() {
     gameState.itemsSorted = 0;
     gameState.gameRunning = true;
     gameState.paused = false;
+    gameState.valuableItemOnBelt = false;
+    gameState.stopButtonActive = false;
+    gameState.beltStopped = false;
+    showStopButton(); // Stoppknappen skal alltid være synlig!
 
     const config = levelConfig[level];
     gameState.currentLevelItems = [...config.items];
@@ -242,6 +251,12 @@ function moveItemsOnBelt() {
             currentPos = maxAllowed;
         }
 
+        // Check if a valuable item has reached the end of the belt!
+        if (item.valuable && currentPos >= maxRightPosition) {
+            handleValuableItemReachedEnd(element, item.data.name);
+            return;
+        }
+
         element.dataset.position = currentPos;
         element.style.left = `${currentPos}px`;
     });
@@ -253,23 +268,39 @@ function spawnItem() {
         return;
     }
 
-    // Pick a random item from current level items
-    const randomItem = gameState.currentLevelItems[
-        Math.floor(Math.random() * gameState.currentLevelItems.length)
-    ];
+    // Randomly spawn a valuable item (20% chance for testing, will be 5% in production)
+    let randomItem;
+    let isValuable = false;
 
-    const itemElement = createWasteItem(randomItem);
+    if (!gameState.valuableItemOnBelt && Math.random() < 0.20) {
+        randomItem = VALUABLE_ITEMS[Math.floor(Math.random() * VALUABLE_ITEMS.length)];
+        isValuable = true;
+        gameState.valuableItemOnBelt = true;
+        gameState.stopButtonActive = true;
+        // Knappen er alltid synlig, så vi trenger ikke å vise den
+    } else {
+        // Pick a random item from current level items
+        randomItem = gameState.currentLevelItems[
+            Math.floor(Math.random() * gameState.currentLevelItems.length)
+        ];
+    }
+
+    const itemElement = createWasteItem(randomItem, isValuable);
     elements.conveyor.appendChild(itemElement);  // Add to DOM (position doesn't matter with absolute)
-    gameState.itemsOnBelt.push({ element: itemElement, data: randomItem });  // Add to END of array (newest = highest index)
+    gameState.itemsOnBelt.push({ element: itemElement, data: randomItem, valuable: isValuable });  // Add to END of array (newest = highest index)
 
     updateCapacity();
 }
 
-function createWasteItem(itemData) {
+function createWasteItem(itemData, isValuable = false) {
     const item = document.createElement('div');
     item.className = 'waste-item';
+    if (isValuable) {
+        item.classList.add('valuable');
+        item.dataset.valuable = 'true';
+    }
     item.draggable = true;
-    item.dataset.category = itemData.category;
+    item.dataset.category = itemData.category || '';
     item.dataset.name = itemData.name;
     item.dataset.position = '20'; // Start at left side (padding position)
 
@@ -278,7 +309,7 @@ function createWasteItem(itemData) {
         <div class="name">${itemData.name}</div>
     `;
 
-    // Drag events
+    // Drag events for all items (including valuable ones)
     item.addEventListener('dragstart', handleDragStart);
     item.addEventListener('dragend', handleDragEnd);
 
@@ -294,6 +325,7 @@ function handleDragStart(e) {
     e.dataTransfer.setData('text/html', e.target.innerHTML);
     e.dataTransfer.setData('category', e.target.dataset.category);
     e.dataTransfer.setData('name', e.target.dataset.name);
+    e.dataTransfer.setData('valuable', e.target.dataset.valuable || 'false');
 
     // Create a visible drag image
     const dragImage = e.target.cloneNode(true);
@@ -340,11 +372,19 @@ function handleDrop(e) {
 
     const draggedCategory = e.dataTransfer.getData('category');
     const draggedName = e.dataTransfer.getData('name');
+    const isValuable = e.dataTransfer.getData('valuable') === 'true';
     const containerCategory = container.dataset.category;
 
     // Find the dragged element
     const draggedElement = document.querySelector('.waste-item.dragging');
     if (!draggedElement) return;
+
+    // Check if it's a valuable item!
+    if (isValuable) {
+        // OH NO! You threw away something valuable!
+        handleValuableItemThrownAway(draggedElement, draggedName);
+        return;
+    }
 
     if (draggedCategory === containerCategory) {
         // Correct sort!
@@ -391,8 +431,13 @@ function handleWrongSort(itemElement, container) {
     // Lose points
     gameState.score -= 5;
 
-    // Show negative points feedback
+    // Show negative points feedback on container
     showPointsFeedback('-5', container);
+
+    // Show red error message above belt
+    const itemName = itemElement.dataset.name;
+    const correctCategory = WASTE_CATEGORIES[itemElement.dataset.category];
+    showErrorToast(`${itemName} hører ikke der! Skulle i ${correctCategory.name}`, '❌');
 
     // Play wrong sound
     playSound('yuck');
@@ -403,10 +448,132 @@ function handleWrongSort(itemElement, container) {
 function removeItemFromBelt(itemElement) {
     const index = gameState.itemsOnBelt.findIndex(item => item.element === itemElement);
     if (index > -1) {
+        // Check if it was a valuable item
+        if (gameState.itemsOnBelt[index].valuable) {
+            gameState.valuableItemOnBelt = false;
+            gameState.stopButtonActive = false;
+            // Knappen skal ikke skjules - den skal alltid være der!
+        }
         gameState.itemsOnBelt.splice(index, 1);
     }
     itemElement.remove();
     updateCapacity();
+}
+
+function showStopButton() {
+    elements.stopButton.style.display = 'block';
+}
+
+function hideStopButton() {
+    elements.stopButton.style.display = 'none';
+}
+
+function handleStopButton() {
+    // Ignorer hvis spillet allerede er stoppet
+    if (gameState.beltStopped || gameState.paused) {
+        return;
+    }
+
+    // Stop the belt
+    gameState.beltStopped = true;
+    gameState.paused = true;
+
+    // Check if there's actually a valuable item
+    const hasValuableItem = gameState.itemsOnBelt.some(item => item.valuable);
+
+    if (hasValuableItem) {
+        // SUCCESS! Saved the valuable item
+        const valuableItem = gameState.itemsOnBelt.find(item => item.valuable);
+        handleValuableItemSaved(valuableItem);
+    } else {
+        // PENALTY! No valuable item on belt
+        handleUnnecessaryStop();
+    }
+}
+
+function handleValuableItemSaved(valuableItem) {
+    const itemData = valuableItem.data;
+    const itemElement = valuableItem.element;
+
+    // Remove valuable item from belt
+    removeItemFromBelt(itemElement);
+
+    // Add big bonus points
+    gameState.score += itemData.points;
+    updateUI();
+
+    // Show celebration
+    showValuableItemToast(itemData.fact, itemData.emoji, itemData.points);
+    playValuableItemSound();
+
+    // Add fireworks effect
+    createFireworks();
+
+    // Resume game after 2 seconds
+    setTimeout(() => {
+        gameState.beltStopped = false;
+        gameState.paused = false;
+    }, 2000);
+}
+
+function handleUnnecessaryStop() {
+    // Penalty for stopping unnecessarily
+    const penalty = 50;
+    gameState.score = Math.max(0, gameState.score - penalty);
+    updateUI();
+
+    // Show penalty message
+    showPenaltyToast(`Du stoppet båndet uten grunn! -${penalty} poeng`);
+    playSound('wrong');
+
+    // Resume game after 2 seconds
+    setTimeout(() => {
+        gameState.beltStopped = false;
+        gameState.paused = false;
+    }, 2000);
+}
+
+function handleValuableItemThrownAway(itemElement, itemName) {
+    // Remove the item
+    removeItemFromBelt(itemElement);
+
+    // Stop the game
+    gameState.gameRunning = false;
+    clearInterval(gameState.itemsSpawnInterval);
+    clearInterval(gameState.itemsMoveInterval);
+
+    // Show dramatic error message
+    showValuableItemLostMessage(`Du kastet ${itemName} i søpla! 😱`, 'Du må starte nivået på nytt.');
+    playSound('wrong');
+
+    // Restart level after 3 seconds
+    setTimeout(() => {
+        restartCurrentLevel();
+    }, 3000);
+}
+
+function handleValuableItemReachedEnd(itemElement, itemName) {
+    // Remove the item
+    removeItemFromBelt(itemElement);
+
+    // Stop the game
+    gameState.gameRunning = false;
+    clearInterval(gameState.itemsSpawnInterval);
+    clearInterval(gameState.itemsMoveInterval);
+
+    // Show dramatic error message
+    showValuableItemLostMessage(`${itemName} falt av båndet! 😱`, 'Du måtte ha stoppet båndet!');
+    playSound('wrong');
+
+    // Restart level after 3 seconds
+    setTimeout(() => {
+        restartCurrentLevel();
+    }, 3000);
+}
+
+function restartCurrentLevel() {
+    // Reset score to what it was at the start of the level (don't reset completely)
+    startCurrentLevel();
 }
 
 function updateCapacity() {
@@ -707,13 +874,13 @@ function quitGame() {
     showScreen('start');
 }
 
-// Toast for facts
+// Toast for facts - now shown above the conveyor belt
 function showFactToast(fact, emoji) {
     const toast = document.createElement('div');
     toast.className = 'fact-toast';
     toast.style.cssText = `
-        position: fixed;
-        bottom: 30px;
+        position: absolute;
+        top: -80px;
         left: 50%;
         transform: translateX(-50%);
         background: rgba(76, 175, 80, 0.95);
@@ -726,15 +893,57 @@ function showFactToast(fact, emoji) {
         max-width: 500px;
         text-align: center;
         box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     `;
     toast.innerHTML = `<strong>${emoji}</strong> ${fact}`;
 
-    document.body.appendChild(toast);
+    // Add to the conveyor belt container instead of body
+    const conveyorContainer = document.querySelector('.conveyor-belt-container');
+    conveyorContainer.style.position = 'relative';
+    conveyorContainer.appendChild(toast);
 
     setTimeout(() => {
         toast.style.animation = 'fadeOut 0.3s';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+// Toast for errors - shown above the conveyor belt in red
+function showErrorToast(message, emoji) {
+    const toast = document.createElement('div');
+    toast.className = 'error-toast';
+    toast.style.cssText = `
+        position: absolute;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(244, 67, 54, 0.95);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 1.1em;
+        z-index: 1000;
+        animation: fadeIn 0.3s;
+        max-width: 500px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    `;
+    toast.innerHTML = `<strong>${emoji}</strong> ${message}`;
+
+    // Add to the conveyor belt container instead of body
+    const conveyorContainer = document.querySelector('.conveyor-belt-container');
+    conveyorContainer.style.position = 'relative';
+    conveyorContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000); // Shorter duration for error messages
 }
 
 // Show points feedback (for wrong sorts)
@@ -828,3 +1037,217 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Valuable item toast (special celebration)
+function showValuableItemToast(fact, emoji, points) {
+    const toast = document.createElement('div');
+    toast.className = 'valuable-toast';
+    toast.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        color: white;
+        padding: 30px 40px;
+        border-radius: 20px;
+        font-size: 1.5em;
+        z-index: 2000;
+        animation: fadeIn 0.5s;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(255, 215, 0, 0.8);
+        border: 4px solid white;
+        font-weight: bold;
+    `;
+    toast.innerHTML = `
+        <div style="font-size: 3em; margin-bottom: 10px;">${emoji}</div>
+        <div>${fact}</div>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.5s';
+        setTimeout(() => toast.remove(), 500);
+    }, 1800);
+}
+
+// Penalty toast
+function showPenaltyToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'penalty-toast';
+    toast.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(244, 67, 54, 0.95);
+        color: white;
+        padding: 30px 40px;
+        border-radius: 20px;
+        font-size: 1.5em;
+        z-index: 2000;
+        animation: fadeIn 0.5s;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(244, 67, 54, 0.8);
+        font-weight: bold;
+    `;
+    toast.innerHTML = `
+        <div style="font-size: 3em; margin-bottom: 10px;">⚠️</div>
+        <div>${message}</div>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.5s';
+        setTimeout(() => toast.remove(), 500);
+    }, 1800);
+}
+
+// Fireworks effect
+function createFireworks() {
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const firework = document.createElement('div');
+            firework.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 10px;
+                height: 10px;
+                background: ${['#FFD700', '#FFA500', '#FF6347', '#4CAF50', '#2196F3'][Math.floor(Math.random() * 5)]};
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 1500;
+            `;
+
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 100 + Math.random() * 200;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
+
+            document.body.appendChild(firework);
+
+            let x = 0;
+            let y = 0;
+            let opacity = 1;
+
+            const animate = () => {
+                x += vx / 30;
+                y += vy / 30;
+                opacity -= 0.02;
+
+                firework.style.transform = `translate(${x}px, ${y}px)`;
+                firework.style.opacity = opacity;
+
+                if (opacity > 0) {
+                    requestAnimationFrame(animate);
+                } else {
+                    firework.remove();
+                }
+            };
+
+            animate();
+        }, i * 30);
+    }
+}
+
+// Valuable item sound (special success sound)
+function playValuableItemSound() {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioContext.currentTime;
+
+    // Play a triumphant melody
+    const notes = [
+        { freq: 523.25, time: 0 },      // C5
+        { freq: 659.25, time: 0.15 },   // E5
+        { freq: 783.99, time: 0.3 },    // G5
+        { freq: 1046.50, time: 0.45 }   // C6
+    ];
+
+    notes.forEach(note => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(note.freq, now + note.time);
+        gainNode.gain.setValueAtTime(0.3, now + note.time);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + note.time + 0.4);
+
+        oscillator.start(now + note.time);
+        oscillator.stop(now + note.time + 0.4);
+    });
+}
+
+// Dramatic error message for losing valuable items
+function showValuableItemLostMessage(title, subtitle) {
+    const overlay = document.createElement('div');
+    overlay.className = 'valuable-lost-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s;
+    `;
+
+    const messageBox = document.createElement('div');
+    messageBox.style.cssText = `
+        background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+        color: white;
+        padding: 50px 60px;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 600px;
+        border: 5px solid #ff5252;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        animation: blink 0.5s infinite;
+    `;
+
+    messageBox.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">⚠️</div>
+        <h2 style="font-size: 2.5em; margin-bottom: 15px; font-weight: bold;">${title}</h2>
+        <p style="font-size: 1.5em; margin-bottom: 20px;">${subtitle}</p>
+        <p style="font-size: 1.2em; opacity: 0.9;">Starter på nytt om 3 sekunder...</p>
+    `;
+
+    overlay.appendChild(messageBox);
+    document.body.appendChild(overlay);
+
+    // Add blink animation
+    const blinkStyle = document.createElement('style');
+    blinkStyle.textContent = `
+        @keyframes blink {
+            0%, 100% {
+                border-color: #ff5252;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            }
+            50% {
+                border-color: #ffeb3b;
+                box-shadow: 0 20px 80px rgba(255, 82, 82, 0.8);
+            }
+        }
+    `;
+    document.head.appendChild(blinkStyle);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        overlay.style.animation = 'fadeOut 0.5s';
+        setTimeout(() => {
+            overlay.remove();
+            blinkStyle.remove();
+        }, 500);
+    }, 2500);
+}
