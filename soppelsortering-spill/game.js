@@ -3,7 +3,7 @@ const gameState = {
     currentLevel: 1,
     score: 0,
     itemsOnBelt: [],
-    maxItemsOnBelt: 10,
+    maxItemsOnBelt: 15,  // Økt fra 10 til 15 for mer buffer
     itemsSpawnInterval: null,
     itemsMoveInterval: null,
     currentLevelItems: [],
@@ -228,6 +228,21 @@ function moveItemsOnBelt() {
     const gap = 15;
     const padding = 20;
     const maxRightPosition = beltWidth - itemWidth - padding - 20;
+    const minVisiblePosition = 100; // Gjenstander til venstre for dette er "i kø"
+
+    // Tell hvor mange gjenstander som er i kø til venstre
+    let itemsInQueue = 0;
+    gameState.itemsOnBelt.forEach((item) => {
+        const pos = parseInt(item.element.dataset.position || 0);
+        if (pos < minVisiblePosition) {
+            itemsInQueue++;
+        }
+    });
+
+    // Øk hastigheten hvis det er gjenstander i kø
+    const baseSpeed = 2;
+    const speedMultiplier = itemsInQueue > 3 ? 2.5 : 1; // 2.5x hastighet hvis mer enn 3 i kø
+    const moveSpeed = baseSpeed * speedMultiplier;
 
     gameState.itemsOnBelt.forEach((item, index) => {
         const element = item.element;
@@ -236,7 +251,7 @@ function moveItemsOnBelt() {
         if (element.classList.contains('dragging')) return;
 
         let currentPos = parseInt(element.dataset.position || 0);
-        currentPos += 2;
+        currentPos += moveSpeed;
 
         let maxAllowed = maxRightPosition;
 
